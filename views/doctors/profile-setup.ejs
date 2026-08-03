@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<div class="md:ml-64 flex flex-col min-h-screen bg-gray-50">
+  <%- include('partials/navbar') %>
+  <%- include('partials/flash') %>
+  <main class="flex-1 p-4 sm:p-6 lg:p-8 w-full max-w-4xl mx-auto">
+    
+    <div class="mb-6 text-center sm:text-left">
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Set Up Your Medical Profile</h1>
+      <p class="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Patients will see this information when booking an appointment.</p>
+    </div>
+
+    <form action="/api/doctor/profile/create" method="POST" class="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
+      
+      <!-- Grid for side-by-side inputs on desktop, stacked on mobile -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        
+        <div>
+          <label for="specialization" class="block text-sm font-medium text-gray-700 mb-1">Specialization *</label>
+          <input type="text" name="specialization" id="specialization" placeholder="e.g., Veterinary Surgeon, General Physician" required class="w-full border border-gray-300 rounded-md shadow-sm p-2.5 text-sm focus:ring-teal-500 focus:border-teal-500">
+        </div>
+
+        <div>
+          <label for="qualification" class="block text-sm font-medium text-gray-700 mb-1">Highest Qualification *</label>
+          <input type="text" name="qualification" id="qualification" placeholder="e.g., BVSc & AH, MVSc" required class="w-full border border-gray-300 rounded-md shadow-sm p-2.5 text-sm focus:ring-teal-500 focus:border-teal-500">
+        </div>
+
+        <div>
+          <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+          <input type="number" name="experience" id="experience" min="0" value="0" class="w-full border border-gray-300 rounded-md shadow-sm p-2.5 text-sm focus:ring-teal-500 focus:border-teal-500">
+        </div>
+
+        <div>
+          <label for="consultationFee" class="block text-sm font-medium text-gray-700 mb-1">Consultation Fee (₹) *</label>
+          <input type="number" name="consultationFee" id="consultationFee" min="0" placeholder="e.g., 500" required class="w-full border border-gray-300 rounded-md shadow-sm p-2.5 text-sm focus:ring-teal-500 focus:border-teal-500">
+        </div>
+
+      </div>
+
+      <div>
+        <label for="clinicAddress" class="block text-sm font-medium text-gray-700 mb-1">Full Clinic Address</label>
+        <textarea name="clinicAddress" id="clinicAddress" rows="2" placeholder="Enter the complete address where patients will visit..." class="w-full border border-gray-300 rounded-md shadow-sm p-2.5 text-sm focus:ring-teal-500 focus:border-teal-500"></textarea>
+      </div>
+
+      <div>
+        <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">Professional Bio</label>
+        <textarea name="bio" id="bio" rows="4" maxlength="1000" placeholder="Write a short biography about your practice and expertise..." class="w-full border border-gray-300 rounded-md shadow-sm p-2.5 text-sm focus:ring-teal-500 focus:border-teal-500"></textarea>
+        <p class="text-xs text-gray-500 mt-1">Maximum 1000 characters.</p>
+      </div>
+
+      <div class="pt-4 border-t border-gray-100">
+        <button type="submit" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-md shadow-sm transition text-sm sm:text-base">
+          Save & Activate Profile
+        </button>
+      </div>
+
+    </form>
+  </main>
+</div>
+
+<%- include('partials/footer') %>

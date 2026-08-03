@@ -1,0 +1,172 @@
+<%- include('./partials/header', { title: 'Pet Profile' }) %>
+<%- include('./partials/sidebar') %>
+<%- include('./partials/navbar') %>
+
+<main class="main-content">
+    <div class="container-fluid py-3 py-md-4">
+        
+        <!-- Header & Breadcrumbs -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+            <div class="w-100 text-truncate">
+                <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-id-card me-2 text-primary"></i>Pet Profile</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 flex-nowrap overflow-hidden">
+                        <li class="breadcrumb-item"><a href="/api/pet/dashboard" class="text-decoration-none text-truncate">Dashboard</a></li>
+                        <li class="breadcrumb-item active text-truncate" aria-current="page" style="max-width: 150px;"><%= petDetails.name %></li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="w-100 w-md-auto mt-2 mt-md-0">
+                <!-- Button spans 100% on mobile, auto on md+ screens -->
+                <a href="/api/pet/edit/<%= petDetails._id %>" class="btn btn-primary shadow-sm w-100">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <% if (locals.messages && messages.error) { %>
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm text-break" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-2"></i><%= messages.error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+        <% if (locals.messages && messages.success) { %>
+            <div class="alert alert-success alert-dismissible fade show shadow-sm text-break" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i><%= messages.success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+
+        <div class="row g-3 g-md-4">
+            
+            <!-- Left Column: Image & Basic Info Card -->
+            <div class="col-12 col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 text-center overflow-hidden h-100">
+                    <!-- Dynamic Background Color Banner -->
+                    <div class="bg-primary bg-opacity-10 py-4">
+                        <img src="<%= petDetails.image || '/images/default-pet.png' %>" alt="<%= petDetails.name %>" 
+                             class="rounded-circle shadow object-fit-cover bg-white p-1" 
+                             style="width: 130px; height: 130px; border: 4px solid #fff;">
+                    </div>
+                    
+                    <div class="card-body p-3 p-md-4 pt-3">
+                        <h4 class="fw-bold mb-0 text-break"><%= petDetails.name %></h4>
+                        <p class="text-muted mb-3 text-break"><%= petDetails.breed ? petDetails.breed : petDetails.species %></p>
+                        
+                        <!-- Badges wrap neatly on 360px -->
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                <i class="fa-solid fa-paw text-primary me-1"></i> <%= petDetails.species %>
+                            </span>
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                <% if (petDetails.gender === 'Male') { %>
+                                    <i class="fa-solid fa-mars text-info me-1"></i>
+                                <% } else if (petDetails.gender === 'Female') { %>
+                                    <i class="fa-solid fa-venus text-danger me-1"></i>
+                                <% } else { %>
+                                    <i class="fa-solid fa-genderless text-secondary me-1"></i>
+                                <% } %>
+                                <%= petDetails.gender || 'Unknown' %>
+                            </span>
+                        </div>
+
+                        <% if (petDetails.bio) { %>
+                            <div class="border-top pt-3 text-start">
+                                <h6 class="fw-bold text-uppercase small text-muted mb-2">About</h6>
+                                <p class="small text-secondary mb-0 text-break"><%= petDetails.bio %></p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Detailed Stats & Health Info -->
+            <div class="col-12 col-lg-8">
+                
+                <!-- Physical Attributes Card -->
+                <div class="card border-0 shadow-sm rounded-4 mb-3 mb-md-4">
+                    <div class="card-header bg-white border-0 pt-3 pt-md-4 pb-0 px-3 px-md-4">
+                        <h5 class="fw-bold mb-0">Physical Attributes</h5>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
+                        <div class="row g-2 g-md-3">
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded-3 p-2 p-md-3 bg-light text-center h-100">
+                                    <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Age</small>
+                                    <span class="fs-6 fs-md-5 fw-semibold text-break"><%= petDetails.age || 'N/A' %></span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded-3 p-2 p-md-3 bg-light text-center h-100">
+                                    <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Weight</small>
+                                    <span class="fs-6 fs-md-5 fw-semibold text-break"><%= petDetails.weight ? petDetails.weight + ' kg' : 'N/A' %></span>
+                                </div>
+                            </div>
+                            <!-- Spans 100% on mobile to prevent squishing, 1/3 width on desktop -->
+                            <div class="col-12 col-md-4">
+                                <div class="border rounded-3 p-2 p-md-3 bg-light text-center h-100">
+                                    <small class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.75rem;">Color</small>
+                                    <span class="fs-6 fs-md-5 fw-semibold text-break"><%= petDetails.color || 'N/A' %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Information Card -->
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-0 pt-3 pt-md-4 pb-0 px-3 px-md-4">
+                        <h5 class="fw-bold mb-0">Health & Medical</h5>
+                    </div>
+                    <div class="card-body p-3 p-md-4">
+                        
+                        <div class="mb-4">
+                            <h6 class="d-flex align-items-center fw-bold mb-2 text-wrap">
+                                <i class="fa-solid fa-syringe text-success me-2"></i> Vaccination Details
+                            </h6>
+                            <div class="p-3 bg-light rounded-3 border">
+                                <% if (petDetails.vaccinationDetails) { %>
+                                    <p class="mb-0 text-secondary text-break" style="white-space: pre-wrap; font-size: 0.9rem;"><%= petDetails.vaccinationDetails %></p>
+                                <% } else { %>
+                                    <p class="mb-0 text-muted fst-italic" style="font-size: 0.9rem;">No vaccination details provided.</p>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6 class="d-flex align-items-center fw-bold mb-2 text-wrap">
+                                <i class="fa-solid fa-notes-medical text-danger me-2"></i> Medical History
+                            </h6>
+                            <div class="p-3 bg-light rounded-3 border">
+                                <% if (petDetails.medicalHistory) { %>
+                                    <p class="mb-0 text-secondary text-break" style="white-space: pre-wrap; font-size: 0.9rem;"><%= petDetails.medicalHistory %></p>
+                                <% } else { %>
+                                    <p class="mb-0 text-muted fst-italic" style="font-size: 0.9rem;">No medical history provided.</p>
+                                <% } %>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Custom CSS for strict mobile rules -->
+<style>
+    @media (max-width: 767.98px) {
+        .w-md-auto {
+            width: 100% !important;
+        }
+    }
+    @media (min-width: 768px) {
+        .w-md-auto {
+            width: auto !important;
+        }
+    }
+</style>
+
+<%- include('./partials/footer') %>

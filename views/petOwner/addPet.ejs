@@ -1,0 +1,144 @@
+<%- include('./partials/header', { title: 'Add a New Pet' }) %>
+<%- include('./partials/sidebar') %>
+<%- include('./partials/navbar') %>
+
+<main class="main-content">
+    <div class="container-fluid py-4">
+        
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-0"><i class="fa-solid fa-paw me-2 text-primary"></i>Add a New Pet</h3>
+                <p class="text-muted mb-0">Register your furry friend to access POSHIK healthcare and marketplace features.</p>
+            </div>
+            <a href="/api/pet/dashboard" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+         <% if (typeof successMsg !== 'undefined' && successMsg.length > 0) { %>
+      <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded" role="alert">
+        <p><%= successMsg %></p>
+      </div>
+    <% } %>
+
+    <!-- Flash Error Message Block -->
+    <% if (typeof errorMsg !== 'undefined' && errorMsg.length > 0) { %>
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded" role="alert">
+        <p><%- errorMsg %></p>
+      </div>
+    <% } %>
+
+        <!-- Add Pet Form Card -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <!-- IMPORTANT: enctype="multipart/form-data" is required for req.file to work -->
+                <form action="/api/pet/create" method="POST" enctype="multipart/form-data">
+                    
+                    <h5 class="fw-bold mb-4 border-bottom pb-2">Basic Information</h5>
+                    
+                    <div class="row g-4 mb-4">
+                        <!-- Pet Name -->
+                        <div class="col-md-6">
+                            <label for="name" class="form-label fw-semibold">Pet Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light" id="name" name="name" placeholder="e.g. Buddy" required>
+                        </div>
+
+                        <!-- Species -->
+                        <div class="col-md-6">
+                            <label for="species" class="form-label fw-semibold">Species <span class="text-danger">*</span></label>
+                            <select class="form-select bg-light" id="species" name="species" required>
+                                <option value="" selected disabled>Select Species</option>
+                                <option value="Dog">Dog</option>
+                                <option value="Cat">Cat</option>
+                                <option value="Bird">Bird</option>
+                                <option value="Fish">Fish</option>
+                                <option value="Small Pet">Small Pet (Rabbit, Hamster, etc.)</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Breed -->
+                        <div class="col-md-6">
+                            <label for="breed" class="form-label fw-semibold">Breed</label>
+                            <input type="text" class="form-control bg-light" id="breed" name="breed" placeholder="e.g. Golden Retriever">
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="col-md-6">
+                            <label for="gender" class="form-label fw-semibold">Gender</label>
+                            <select class="form-select bg-light" id="gender" name="gender">
+                                <option value="" selected disabled>Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Unknown">Unknown</option>
+                            </select>
+                        </div>
+
+                        <!-- Age -->
+                        <div class="col-md-4">
+                            <label for="age" class="form-label fw-semibold">Age (Years/Months)</label>
+                            <input type="text" class="form-control bg-light" id="age" name="age" placeholder="e.g. 2 Years">
+                        </div>
+
+                        <!-- Weight -->
+                        <div class="col-md-4">
+                            <label for="weight" class="form-label fw-semibold">Weight (kg)</label>
+                            <input type="number" step="0.1" class="form-control bg-light" id="weight" name="weight" placeholder="e.g. 15.5">
+                        </div>
+
+                        <!-- Color -->
+                        <div class="col-md-4">
+                            <label for="color" class="form-label fw-semibold">Color</label>
+                            <input type="text" class="form-control bg-light" id="color" name="color" placeholder="e.g. Golden">
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 border-bottom pb-2 mt-5">Media & Details</h5>
+
+                    <div class="row g-4 mb-4">
+                        <!-- Pet Image -->
+                        <div class="col-12">
+                            <label for="image" class="form-label fw-semibold">Pet Photo</label>
+                            <input type="file" class="form-control bg-light" id="image" name="image" accept="image/png, image/jpeg, image/jpg, image/webp">
+                            <div class="form-text">Upload a clear picture of your pet. (PNG, JPG, WEBP)</div>
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="col-12">
+                            <label for="bio" class="form-label fw-semibold">Pet Bio / Personality</label>
+                            <textarea class="form-control bg-light" id="bio" name="bio" rows="3" placeholder="Tell us a little bit about your pet's personality..."></textarea>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 border-bottom pb-2 mt-5">Health Information</h5>
+
+                    <div class="row g-4 mb-5">
+                        <!-- Vaccination Details -->
+                        <div class="col-md-6">
+                            <label for="vaccinationDetails" class="form-label fw-semibold">Basic Vaccination Details</label>
+                            <textarea class="form-control bg-light" id="vaccinationDetails" name="vaccinationDetails" rows="4" placeholder="List recent vaccines and dates..."></textarea>
+                        </div>
+
+                        <!-- Medical History -->
+                        <div class="col-md-6">
+                            <label for="medicalHistory" class="form-label fw-semibold">Basic Medical History</label>
+                            <textarea class="form-control bg-light" id="medicalHistory" name="medicalHistory" rows="4" placeholder="List any past illnesses, surgeries, or allergies..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="reset" class="btn btn-light px-4 me-md-2 border">Clear Form</button>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm">
+                            <i class="fa-solid fa-plus me-2"></i>Save Pet
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<%- include('./partials/footer') %>

@@ -1,0 +1,34 @@
+{
+  "name": "poshik",
+  "version": "1.0.0",
+  "description": "It serves as a complete social networking and service platform for pet owners, veterinarians, petshops, and administrators.The platform combines social networking, pet management, veterinary services, pet productmarketplace, and community engagement into one ecosystem.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "Sourov Naskar",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.1",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "joi": "^18.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.8.0",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.3",
+    "nodemon": "^3.1.14",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0"
+  }
+}

@@ -1,0 +1,36 @@
+<div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+    <!-- Responsive padding: smaller on mobile (px-3 py-2), standard on desktop (px-md-4 py-md-3) -->
+    <nav class="navbar navbar-expand-lg top-navbar px-3 py-2 px-md-4 py-md-3">
+        <div class="container-fluid px-0">
+            
+            <!-- Mobile Sidebar Toggle -->
+            <button class="btn btn-outline-secondary d-md-none me-2 p-1 px-2" type="button" id="sidebarToggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+            <!-- Responsive Greeting (Truncates name if too long on 360px) -->
+            <h5 class="mb-0 text-dark fw-semibold welcome-text text-truncate me-auto" style="max-width: 180px;">
+                <span class="welcome-prefix">Welcome Back, </span><%= user ? user.name : 'Owner' %>!
+            </h5>
+            
+            <div class="ms-2 d-flex align-items-center">
+                <!-- User Dropdown -->
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="<%= user && user.image ? user.image : '/images/default-avatar.png' %>" alt="Profile" class="profile-img me-1 me-md-2">
+                        <!-- Name is hidden on extreme mobile, shown on slightly larger screens -->
+                        <span class="fw-medium d-none d-sm-inline text-truncate" style="max-width: 100px;"><%= user ? user.name : 'User' %></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 position-absolute" aria-labelledby="dropdownUser">
+                        <li><a class="dropdown-item" href="/api/pet/owner/profile"><i class="fa-solid fa-user-gear me-2"></i>Profile Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/api/auth/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </nav>
+    
+    <!-- Mobile Sidebar Dark Overlay (Clicking this will close the sidebar) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>

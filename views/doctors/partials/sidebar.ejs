@@ -1,0 +1,86 @@
+<!-- Sidebar (Hidden on mobile, fixed to the left on desktop) -->
+<aside id="sidebar"
+  class="hidden md:flex flex-col w-64 bg-white shadow-lg h-screen fixed top-0 left-0 z-40 overflow-y-auto">
+  <div class="p-6 hidden md:block">
+    <h2 class="text-2xl font-bold text-teal-600">Poshik</h2>
+  </div>
+
+  <nav class="flex-1 px-4 py-4 space-y-2">
+    <!-- Always Accessible -->
+    <a href="/api/doctor/dashboard"
+      class="flex items-center p-3 text-gray-700 bg-teal-50 rounded-lg hover:bg-teal-100 transition">
+      <span>Dashboard</span>
+    </a>
+
+    <% if (user.kycStatus==='Not Submitted' || user.kycStatus==='Rejected' ) { %>
+      <a href="/doctor/kyc-submit"
+        class="flex items-center p-3 text-red-600 bg-red-50 font-medium rounded-lg hover:bg-red-100 transition">
+        <span>⚠️ Submit KYC</span>
+      </a>
+      <% } else if (user.kycStatus==='Pending' ) { %>
+        <div class="flex items-center p-3 text-yellow-600 bg-yellow-50 font-medium rounded-lg">
+          <span>⏳ KYC Pending Review</span>
+        </div>
+        <% } %>
+
+          <!-- Conditionally Locked Links -->
+          <% const isApproved=user.kycStatus==='Approved' ; %>
+
+            <!-- NEW: My Schedule (For creating available time slots) -->
+            <a href="<%= isApproved ? '/api/doctor/appointment/schedule' : '#' %>"
+              class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
+              <span>My Schedule</span>
+              <% if (!isApproved) { %> <span>🔒</span>
+                <% } %>
+            </a>
+
+            <a href="<%= isApproved ? '/doctor/appointments' : '#' %>"
+              class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
+              <span>Appointments</span>
+              <% if (!isApproved) { %> <span>🔒</span>
+                <% } %>
+            </a>
+
+            <a href="<%= isApproved ? '/doctor/patients' : '#' %>"
+              class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
+              <span>My Patients</span>
+              <% if (!isApproved) { %> <span>🔒</span>
+                <% } %>
+            </a>
+
+            <a href="<%= isApproved ? '/doctor/wallet' : '#' %>"
+              class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
+              <span>Earnings</span>
+              <% if (!isApproved) { %> <span>🔒</span>
+                <% } %>
+            </a>
+  </nav>
+
+  <div class="p-4 border-t">
+    <div class="flex items-center gap-3">
+      <img src="<%= user.profileImage %>" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+      <div class="text-sm truncate">
+        <p class="font-bold text-gray-800 truncate">
+          <%= user.name %>
+        </p>
+        <a href="/logout" class="text-red-500 hover:underline">Logout</a>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Simple mobile menu toggle script -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('sidebar');
+
+    if (mobileMenuBtn && sidebar) {
+      mobileMenuBtn.addEventListener('click', () => {
+        // Toggle the hidden class on mobile
+        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('flex');
+      });
+    }
+  });
+</script>

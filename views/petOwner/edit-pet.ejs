@@ -1,0 +1,246 @@
+<%- include('./partials/header', { title: 'Edit ' + pet.name }) %>
+    <%- include('./partials/sidebar') %>
+        <%- include('./partials/navbar') %>
+
+            <main class="main-content">
+                <div class="container-fluid py-3 py-md-4">
+
+                    <!-- Header Section -->
+                    <div
+                        class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+                        <div class="w-100 text-truncate">
+                            <h3 class="fw-bold text-dark mb-0"><i
+                                    class="fa-solid fa-pen-to-square me-2 text-primary"></i>Edit Pet Profile</h3>
+                            <p class="text-muted mb-0 small text-truncate">Update information for <%= pet.name %>
+                            </p>
+                        </div>
+                        <div class="w-100 w-md-auto">
+                            <a href="/api/pet/profile/<%= pet._id %>" class="btn btn-outline-secondary w-100">
+                                <i class="fa-solid fa-arrow-left me-2"></i>Back to Profile
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Flash Messages -->
+
+                    <!--Success Message -->
+                    <% if (typeof successMsg !=='undefined' && successMsg.length> 0) { %>
+                        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded"
+                            role="alert">
+                            <p>
+                                <%= successMsg %>
+                            </p>
+                        </div>
+                        <% } %>
+                        
+                            <!--Error Messages-->
+                            <% if (typeof errorMsg !=='undefined' && errorMsg.length> 0) { %>
+                                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded"
+                                    role="alert">
+                                    <p>
+                                        <%= errorMsg %>
+                                    </p>
+                                </div>
+                                <% } %>
+                                    <!-- Edit Pet Form Card -->
+                                    <div class="card border-0 shadow-sm rounded-4">
+                                        <div class="card-body p-3 p-md-5">
+
+                                            <!-- Make sure to define the update route in your routes file -->
+                                            <form action="/api/pet/update/<%= pet._id %>" method="POST"
+                                                enctype="multipart/form-data">
+
+                                                <h5 class="fw-bold mb-3 border-bottom pb-2 fs-6 fs-md-5">Basic
+                                                    Information</h5>
+
+                                                <div class="row g-3 mb-4">
+                                                    <!-- Pet Name -->
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="name" class="form-label fw-semibold small mb-1">Pet
+                                                            Name
+                                                            <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control bg-light" id="name"
+                                                            name="name" value="<%= pet.name %>" required>
+                                                    </div>
+
+                                                    <!-- Species -->
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="species"
+                                                            class="form-label fw-semibold small mb-1">Species
+                                                            <span class="text-danger">*</span></label>
+                                                        <select class="form-select bg-light" id="species" name="species"
+                                                            required>
+                                                            <option value="Dog" <%=pet.species==='Dog' ? 'selected' : ''
+                                                                %>>Dog
+                                                            </option>
+                                                            <option value="Cat" <%=pet.species==='Cat' ? 'selected' : ''
+                                                                %>>Cat
+                                                            </option>
+                                                            <option value="Bird" <%=pet.species==='Bird' ? 'selected'
+                                                                : '' %>
+                                                                >Bird</option>
+                                                            <option value="Fish" <%=pet.species==='Fish' ? 'selected'
+                                                                : '' %>
+                                                                >Fish</option>
+                                                            <option value="Small Pet" <%=pet.species==='Small Pet'
+                                                                ? 'selected' : '' %>>Small Pet (Rabbit, Hamster, etc.)
+                                                            </option>
+                                                            <option value="Other" <%=pet.species==='Other' ? 'selected'
+                                                                : '' %>
+                                                                >Other</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Breed -->
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="breed"
+                                                            class="form-label fw-semibold small mb-1">Breed</label>
+                                                        <input type="text" class="form-control bg-light" id="breed"
+                                                            name="breed" value="<%= pet.breed || '' %>">
+                                                    </div>
+
+                                                    <!-- Gender -->
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="gender"
+                                                            class="form-label fw-semibold small mb-1">Gender</label>
+                                                        <select class="form-select bg-light" id="gender" name="gender">
+                                                            <option value="" disabled <%=!pet.gender ? 'selected' : ''
+                                                                %>>Select
+                                                                Gender</option>
+                                                            <option value="Male" <%=pet.gender==='Male' ? 'selected'
+                                                                : '' %>
+                                                                >Male</option>
+                                                            <option value="Female" <%=pet.gender==='Female' ? 'selected'
+                                                                : '' %>
+                                                                >Female</option>
+                                                            <option value="Unknown" <%=pet.gender==='Unknown'
+                                                                ? 'selected' : '' %>>Unknown</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Age -->
+                                                    <div class="col-12 col-md-4">
+                                                        <label for="age" class="form-label fw-semibold small mb-1">Age
+                                                            (Years/Months)</label>
+                                                        <input type="text" class="form-control bg-light" id="age"
+                                                            name="age" value="<%= pet.age || '' %>">
+                                                    </div>
+
+                                                    <!-- Weight -->
+                                                    <div class="col-12 col-md-4">
+                                                        <label for="weight"
+                                                            class="form-label fw-semibold small mb-1">Weight
+                                                            (kg)</label>
+                                                        <input type="number" step="0.1" class="form-control bg-light"
+                                                            id="weight" name="weight" value="<%= pet.weight || '' %>">
+                                                    </div>
+
+                                                    <!-- Color -->
+                                                    <div class="col-12 col-md-4">
+                                                        <label for="color"
+                                                            class="form-label fw-semibold small mb-1">Color</label>
+                                                        <input type="text" class="form-control bg-light" id="color"
+                                                            name="color" value="<%= pet.color || '' %>">
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="fw-bold mb-3 border-bottom pb-2 mt-4 fs-6 fs-md-5">Media &
+                                                    Details
+                                                </h5>
+
+                                                <div class="row g-3 mb-4">
+                                                    <!-- Pet Image (Shows Current) -->
+                                                    <div
+                                                        class="col-12 d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                                                        <% if (pet.image) { %>
+                                                            <div class="text-center">
+                                                                <img src="<%= pet.image %>" alt="Current Photo"
+                                                                    class="rounded-circle object-fit-cover border shadow-sm"
+                                                                    style="width: 70px; height: 70px;">
+                                                            </div>
+                                                            <% } %>
+                                                                <div class="flex-grow-1">
+                                                                    <label for="image"
+                                                                        class="form-label fw-semibold small mb-1">Update
+                                                                        Pet
+                                                                        Photo</label>
+                                                                    <input type="file" class="form-control bg-light"
+                                                                        id="image" name="image"
+                                                                        accept="image/png, image/jpeg, image/jpg, image/webp">
+                                                                    <div class="form-text" style="font-size: 0.75rem;">
+                                                                        Upload a
+                                                                        new image to replace the current one. Leave
+                                                                        blank to
+                                                                        keep current photo.</div>
+                                                                </div>
+                                                    </div>
+
+                                                    <!-- Bio -->
+                                                    <div class="col-12">
+                                                        <label for="bio" class="form-label fw-semibold small mb-1">Pet
+                                                            Bio /
+                                                            Personality</label>
+                                                        <textarea class="form-control bg-light" id="bio" name="bio"
+                                                            rows="3"><%= pet.bio || '' %></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <h5 class="fw-bold mb-3 border-bottom pb-2 mt-4 fs-6 fs-md-5">Health
+                                                    Information
+                                                </h5>
+
+                                                <div class="row g-3 mb-4">
+                                                    <!-- Vaccination Details -->
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="vaccinationDetails"
+                                                            class="form-label fw-semibold small mb-1">Basic Vaccination
+                                                            Details</label>
+                                                        <textarea class="form-control bg-light" id="vaccinationDetails"
+                                                            name="vaccinationDetails"
+                                                            rows="4"><%= pet.vaccinationDetails || '' %></textarea>
+                                                    </div>
+
+                                                    <!-- Medical History -->
+                                                    <div class="col-12 col-md-6">
+                                                        <label for="medicalHistory"
+                                                            class="form-label fw-semibold small mb-1">Basic Medical
+                                                            History</label>
+                                                        <textarea class="form-control bg-light" id="medicalHistory"
+                                                            name="medicalHistory"
+                                                            rows="4"><%= pet.medicalHistory || '' %></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Submit Button -->
+                                                <div
+                                                    class="d-flex flex-column flex-md-row justify-content-md-end gap-2 mt-4">
+                                                    <a href="/owner/pets/<%= pet._id %>"
+                                                        class="btn btn-light border w-100 w-md-auto">Cancel</a>
+                                                    <button type="submit"
+                                                        class="btn btn-primary shadow-sm w-100 w-md-auto">
+                                                        <i class="fa-solid fa-save me-2"></i>Update Pet Profile
+                                                    </button>
+                                                </div>
+
+                                            </form>
+                                        </div>
+                                    </div>
+                </div>
+            </main>
+
+            <!-- Custom CSS for strict mobile rules (fixes buttons on 320px) -->
+            <style>
+                @media (max-width: 767.98px) {
+                    .w-md-auto {
+                        width: 100% !important;
+                    }
+                }
+
+                @media (min-width: 768px) {
+                    .w-md-auto {
+                        width: auto !important;
+                    }
+                }
+            </style>
+
+            <%- include('./partials/footer') %>

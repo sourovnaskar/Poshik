@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%=Title%></title>
+  <!-- Using Tailwind CSS for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom style for the background image side */
+    .bg-register-image {
+      background-image: url('https://images.unsplash.com/photo-1552053831-71594a27632d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cGV0c3xlbnwwfHwwfHx8MA%3D%3D'); /* REPLACE WITH YOUR IMAGE URL */
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+
+  <div class="flex flex-col md:flex-row w-full max-w-7xl mx-auto md:mx-4 bg-white rounded-xl shadow-2xl overflow-hidden min-h-[80vh]">
+    
+    <!-- Left Side: Image & Welcome (Hidden on Mobile) -->
+    <div class="hidden md:flex md:w-1/2 bg-register-image relative p-12 flex-col justify-between text-white">
+      <div class="absolute inset-0 bg-black opacity-40"></div> <!-- Overlay for text readability -->
+      <div class="relative z-10">
+        <h1 class="text-5xl font-extrabold tracking-tight">Poshik</h1>
+        <p class="mt-4 text-xl text-gray-200">The premier platform for pet care and connection.</p>
+      </div>
+      <div class="relative z-10">
+        <p class="text-lg font-medium">Join our community today.</p>
+        <p class="text-sm text-gray-300">Manage your pets, connect with doctors, and find everything they need.</p>
+      </div>
+    </div>
+
+    <!-- Right Side: Registration Form -->
+    <div class="w-full md:w-1/2 p-8 md:p-12 xl:p-16 flex flex-col justify-center">
+      
+      <div class="max-w-md mx-auto w-full">
+        <div class="md:hidden text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-blue-600 tracking-tight">Poshik</h1>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Create an Account</h2>
+        <p class="text-gray-600 mb-8">Please fill in the details below to register.</p>
+
+        <!-- Flash Success Message -->
+        <% if (typeof successMsg !== 'undefined' && successMsg.length > 0) { %>
+          <div class="bg-green-50 border-l-4 border-green-500 text-green-800 p-4 mb-6 rounded shadow-sm" role="alert">
+            <p class="font-medium">Success</p>
+            <p class="text-sm"><%= successMsg %></p>
+          </div>
+        <% } %>
+
+        <!-- Flash Error Message Block -->
+        <% if (typeof errorMsg !== 'undefined' && errorMsg.length > 0) { %>
+          <div class="bg-red-50 border-l-4 border-red-500 text-red-800 p-4 mb-6 rounded shadow-sm" role="alert">
+            <p class="font-medium">Error</p>
+            <p class="text-sm"><%= errorMsg %></p>
+          </div>
+        <% } %>
+
+        <form action="/api/auth/register-create" method="POST" enctype="multipart/form-data" class="space-y-5">
+          
+          <!-- Name -->
+          <div>
+            <label for="name" class="block text-sm font-semibold text-gray-700">Full Name</label>
+            <input type="text" id="name" name="name" required placeholder="John Doe"
+              class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition">
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-semibold text-gray-700">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="john.doe@example.com"
+              class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition">
+          </div>
+
+          <!-- Role Selection -->
+          <div>
+            <label for="role" class="block text-sm font-semibold text-gray-700">I am a...</label>
+            <select id="role" name="role" required 
+              class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition bg-white text-gray-700">
+              <option value="" disabled selected>Select your role</option>
+              <option value="Owner">Pet owner</option>
+              <option value="Doctor">Doctor</option>
+              <option value="Shop">Shop Owner</option>
+            </select>
+          </div>
+
+          <!-- Profile Image -->
+          <div>
+            <label for="image" class="block text-sm font-semibold text-gray-700">Profile Image (Optional)</label>
+            <input type="file" id="image" name="image" accept="image/*"
+              class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition cursor-pointer">
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••"
+              class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition">
+          </div>
+
+          <!-- Confirm Password -->
+          <div>
+            <label for="confirmPassword" class="block text-sm font-semibold text-gray-700">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="••••••••"
+              class="mt-1 block w-full px-4 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition">
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" 
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out mt-8">
+            Register
+          </button>
+
+        </form>
+
+        <p class="mt-8 text-center text-sm text-gray-600">
+          Already have an account? <a href="/api/auth/login" class="font-semibold text-blue-600 hover:text-blue-500 transition">Log in</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

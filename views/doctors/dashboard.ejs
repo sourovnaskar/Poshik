@@ -1,0 +1,116 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<!-- Main Wrapper with Left Margin (md:ml-64) to offset the fixed sidebar -->
+<div class="md:ml-64 flex flex-col min-h-screen bg-gray-50">
+  
+  <!-- Top Navbar -->
+  <%- include('partials/navbar') %>
+  <%- include('partials/flash') %>
+  <!-- Main Dashboard Content -->
+  <main class="flex-1 p-4 md:p-6 lg:p-8 w-full overflow-x-hidden">
+    
+    <!-- DYNAMIC KYC & PROFILE BANNERS -->
+    <% if (user.kycStatus === 'Not Submitted') { %>
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 class="text-red-800 font-bold text-lg">⚠️ Action Required: Account Restricted</h3>
+            <p class="text-red-600 text-sm mt-1">Complete your KYC to list your clinic and start receiving appointments.</p>
+          </div>
+          <a href="/api/doctor/kyc/form" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-center text-sm transition whitespace-nowrap">
+            Complete KYC Now
+          </a>
+        </div>
+      </div>
+    <% } else if (user.kycStatus === 'Pending') { %>
+      <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 rounded shadow-sm">
+        <h3 class="text-yellow-800 font-bold text-lg">⏳ Documents Under Review</h3>
+        <p class="text-yellow-700 text-sm mt-1">We are verifying your KYC documents. This usually takes 24-48 hours. You will be notified once approved.</p>
+      </div>
+    <% } else if (user.kycStatus === 'Rejected') { %>
+      <div class="bg-red-100 border-l-4 border-red-600 p-4 mb-6 rounded shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 class="text-red-800 font-bold text-lg">❌ KYC Rejected</h3>
+            <p class="text-red-700 text-sm mt-1">Reason: <%= typeof rejectionReason !== 'undefined' ? rejectionReason : 'Invalid documents provided.' %></p>
+          </div>
+          <a href="/doctor/kyc-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-center text-sm transition whitespace-nowrap">
+            Resubmit Documents
+          </a>
+        </div>
+      </div>
+    <% } else if (user.kycStatus === 'Approved' && !hasProfile) { %>
+      <!-- NEW: KYC is Approved, but Doctor Profile is missing -->
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 class="text-blue-800 font-bold text-lg">🎉 KYC Approved! Final Step</h3>
+            <p class="text-blue-600 text-sm mt-1">Set up your medical profile, consultation fees, and clinic details to start accepting patients.</p>
+          </div>
+          <a href="/api/doctor/profile/form" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center text-sm transition whitespace-nowrap">
+            Create Profile Now
+          </a>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Determine if the dashboard should be locked -->
+    <!-- It is locked if KYC is not approved OR if they haven't created a profile yet -->
+    <% const isLocked = user.kycStatus !== 'Approved' || !hasProfile; %>
+
+    <!-- DASHBOARD WIDGETS (Blurred if locked) -->
+    <div class="<%= isLocked ? 'locked-blur opacity-50 relative' : '' %>">
+      
+      <% if (isLocked) { %>
+        <!-- Overlay Lock Icon for Restricted View -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
+          <span class="text-6xl mb-4">🔒</span>
+          <p class="text-gray-800 font-bold text-xl text-center bg-white/90 px-6 py-3 rounded-lg shadow-sm border border-gray-100 max-w-md">
+            Unlock by verifying your KYC and setting up your clinic profile
+          </p>
+        </div>
+      <% } %>
+
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 class="text-2xl font-bold text-gray-800">Welcome, Dr. <%= user.name.split(' ')[0] %></h1>
+        <% if (user.kycStatus === 'Approved' && hasProfile) { %>
+          <p class="text-sm text-green-600 font-medium bg-green-50 px-3 py-1 rounded-full border border-green-200">
+            ✓ Verified Practitioner
+          </p>
+        <% } %>
+      </div>
+      
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white p-5 md:p-6 rounded-lg shadow-sm border border-gray-100 text-center">
+          <h3 class="text-gray-500 text-xs md:text-sm font-semibold uppercase tracking-wider">Today's Appointments</h3>
+          <p class="text-3xl font-bold text-teal-600 mt-2">0</p>
+        </div>
+        <div class="bg-white p-5 md:p-6 rounded-lg shadow-sm border border-gray-100 text-center">
+          <h3 class="text-gray-500 text-xs md:text-sm font-semibold uppercase tracking-wider">Pending Reviews</h3>
+          <p class="text-3xl font-bold text-yellow-600 mt-2">0</p>
+        </div>
+        <div class="bg-white p-5 md:p-6 rounded-lg shadow-sm border border-gray-100 text-center sm:col-span-2 xl:col-span-1">
+          <h3 class="text-gray-500 text-xs md:text-sm font-semibold uppercase tracking-wider">Weekly Earnings</h3>
+          <p class="text-3xl font-bold text-green-600 mt-2">₹0.00</p>
+        </div>
+      </div>
+
+      <!-- Empty State for Appointments -->
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 text-center py-12 md:py-16">
+        <div class="text-gray-200 mb-4">
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-800">No appointments yet</h3>
+        <p class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">Your schedule is clear for today. Patient bookings will appear here once your profile is verified and active.</p>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<%- include('partials/footer') %>
