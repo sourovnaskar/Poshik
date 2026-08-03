@@ -1,5 +1,9 @@
 const Pet = require("../models/petModel");
 const User = require("../models/userModel");
+const Appointment = require("../models/appointmentModel");
+const DoctorSchedule = require("../models/doctorScheduleModel");
+const Doctor = require("../models/doctorModel");
+const mongoose=require('mongoose')
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs/promises");
 class PetController {
@@ -276,6 +280,210 @@ class PetController {
       res.redirect("/api/pet/dashboard");
     }
   }
+
+  async getMyAppointments(req, res) {
+    try {
+      // Aggregation requires object IDs to be explicitly casted
+      const userId = new mongoose.Types.ObjectId(req.user.id);
+
+      const appointments = await Appointment.aggregate([
+        // 1. MATCH: Find only appointments belonging to the logged-in pet owner
+        {
+          $match: { owner: userId },
+        },
+
+        // 2. LOOKUP: Join the Pet collection to get the pet's name/details
+        {
+          $lookup: {
+            from: "pets", // Mongoose pluralizes model names by default
+            localField: "pet",
+            foreignField: "_id",
+            as: "petDetails",
+          },
+        },
+        // $unwind flattens the array into a single object
+        { $unwind: "$petDetails" },
+
+        // 3. LOOKUP: Join the Doctor collection to get specialization & clinic address
+        {
+          $lookup: {
+            from: "doctors",
+            localField: "doctor",
+            foreignField: "_id",
+            as: "doctorProfile",
+          },
+        },
+        { $unwind: "$doctorProfile" },
+
+        // 4. NESTED LOOKUP: Join the User collection to get the Doctor's actual Name
+        // (Because the Doctor model only stores a reference to the User model)
+        {
+          $lookup: {
+            from: "users",
+            localField: "doctorProfile.user",
+            foreignField: "_id",
+            as: "doctorUser",
+          },
+        },
+        { $unwind: "$doctorUser" },
+
+        // 5. LOOKUP: Join the DoctorSchedule to get shift timings (startTime, endTime)
+        {
+          $lookup: {
+            from: "doctorschedules", // Default plural of DoctorSchedule
+            localField: "schedule",
+            foreignField: "_id",
+            as: "scheduleDetails",
+          },
+        },
+        { $unwind: "$scheduleDetails" },
+
+        // 6. SORT: Order by upcoming dates first
+        {
+          $sort: { appointmentDate: 1 },
+        },
+
+        // 7. PROJECT: Clean up the output so we only send necessary data to EJS
+        {
+          $project: {
+            _id: 1,
+            tokenNumber: 1,
+            appointmentDate: 1,
+            reason: 1,
+            status: 1,
+            consultationFee: 1,
+            "petDetails.name": 1,
+            "doctorUser.name": 1,
+            "doctorProfile.specialization": 1,
+            "doctorProfile.clinicAddress": 1,
+            "scheduleDetails.startTime": 1,
+            "scheduleDetails.endTime": 1,
+          },
+        },
+      ]);
+
+      // Send the cleanly aggregated data to the EJS template
+      res.render("petOwner/appointments", {
+        user: req.user,
+        appointments: appointments,
+      });
+    } catch (error) {
+      console.error("Aggregation Error fetching appointments:", error);
+      req.flash("error", "Failed to load your appointments.");
+      return res.redirect("/api/user/dashboard");
+    }
+  }
+
+
+
+async getDoctorsDirectory  (req, res) {
+  try {
+    const userId = req.user.id;
+
+    // Get today's date at midnight to filter out past shifts
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Run all three database queries CONCURRENTLY for maximum performance
+    const [doctors, pets, schedules] = await Promise.all([
+      
+      // 1. Fetch all doctors and populate their real name from the User collection
+      Doctor.find({}).populate("user", "name"),
+      
+      // 2. Fetch only the pets belonging to the currently logged-in user
+      Pet.find({ owner: userId }),
+      
+      // 3. Fetch all upcoming schedules (ignore past dates)
+      DoctorSchedule.find({ date: { $gte: today } })
+                    .sort({ date: 1, startTime: 1 })
+    ]);
+
+    // Render the EJS page and pass the three arrays to the frontend
+    res.render("petOwner/book-doctor", {
+      user: req.user,
+      doctors: doctors,
+      pets: pets,
+      schedules: schedules
+    });
+
+  } catch (error) {
+    console.error("Error fetching doctors directory:", error);
+    req.flash("error", "Could not load the booking directory at this time.");
+    return res.redirect("/api/user/dashboard");
+  }
+};
+
+async bookAppointment (req, res) {
+  try {
+    const userId = req.user.id; // The logged-in Pet Owner
+    
+    // Data coming from the frontend form in "Book Doctor"
+    const { doctorId, scheduleId, petId, reason } = req.body;
+
+    // 1. Basic Validation
+    if (!doctorId || !scheduleId || !petId || !reason) {
+      req.flash("error", "All fields are required to book an appointment.");
+      return res.redirect("back"); // Sends them back to the booking form
+    }
+
+    // 2. Fetch the Schedule and Doctor details
+    const schedule = await DoctorSchedule.findById(scheduleId);
+    const doctor = await Doctor.findById(doctorId);
+
+    if (!schedule || !doctor) {
+      req.flash("error", "Invalid schedule or doctor selected.");
+      return res.redirect("/api/pet/view/book-doctor");
+    }
+
+    // 3. CRITICAL: Check if the shift is already full
+    if (schedule.bookedCount >= schedule.maxPatients) {
+      req.flash("error", "Sorry, this shift is fully booked. Please select another time.");
+      return res.redirect("/api/pet/view/book-doctor");
+    }
+
+    // 4. ATOMIC UPDATE: Increment bookedCount and get the Token Number
+    // We use $inc to prevent "Race Conditions" (two users clicking book at the exact same millisecond)
+    const updatedSchedule = await DoctorSchedule.findByIdAndUpdate(
+      scheduleId,
+      { $inc: { bookedCount: 1 } },
+      { new: true } // Returns the updated document
+    );
+
+    const generatedTokenNumber = updatedSchedule.bookedCount;
+
+    // 5. Create the Appointment Document!
+    const newAppointment = new Appointment({
+      owner: userId,
+      pet: petId,
+      doctor: doctorId,
+      schedule: scheduleId,
+      tokenNumber: generatedTokenNumber, // Assign the token number!
+      appointmentDate: schedule.date,
+      reason: reason,
+      consultationFee: doctor.consultationFee, // Pulled dynamically from the Doctor's profile
+      status: "Confirmed"
+    });
+
+    await newAppointment.save();
+
+    req.flash("success", `Appointment Confirmed! You are Token #${generatedTokenNumber}`);
+    
+    // Redirect them to the "Appointments" sidebar option so they can see their ticket
+    return res.redirect("/api/pet/view/book-doctor");
+
+  } catch (error) {
+    console.error("Booking Error:", error);
+    
+    // Check for the compound unique index error we added earlier (booking same pet twice in one shift)
+    if (error.code === 11000) {
+      req.flash("error", "You have already booked an appointment for this pet in this shift.");
+    } else {
+      req.flash("error", "An error occurred while booking. Please try again.");
+    }
+    
+    return res.redirect("back");
+  }
+};
 }
 
 module.exports = new PetController();

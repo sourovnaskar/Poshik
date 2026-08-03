@@ -1,0 +1,211 @@
+<%- include('./partials/header') %>
+<%- include('./partials/sidebar') %>
+
+<div class="main-content d-flex flex-column min-vh-100">
+  
+  <%- include('./partials/navbar') %>
+  <%- include('./partials/flash') %>
+  
+  <div class="container-fluid py-4">
+    
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+      <div>
+        <h2 class="fw-bold mb-1 text-dark">Find a Doctor</h2>
+        <p class="text-muted small mb-0">Browse approved veterinarians and book an appointment for your pet.</p>
+      </div>
+    </div>
+
+    <!-- Doctors Grid -->
+    <% if (typeof doctors !== 'undefined' && doctors.length > 0) { %>
+      <div class="row g-4">
+        <% doctors.forEach(doctor => { %>
+          <div class="col-12 col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover-shadow">
+              
+              <div class="card-body p-4">
+                <div class="d-flex align-items-start gap-3 mb-3">
+                  <!-- Avatar Placeholder -->
+                  <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-user-doctor fs-3"></i>
+                  </div>
+                  
+                  <div>
+                    <h5 class="fw-bold mb-1 text-dark">Dr. <%= doctor.user.name %></h5>
+                    <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-2 mb-2"><%= doctor.specialization %></span>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-column gap-2 small text-muted mb-4">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="fa-solid fa-location-dot mt-1 text-secondary" style="width: 14px;"></i>
+                    <span class="text-truncate"><%= doctor.clinicAddress %></span>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-wallet text-secondary" style="width: 14px;"></i>
+                    <span class="fw-bold text-dark">₹<%= doctor.consultationFee %> <span class="fw-normal text-muted">/ visit</span></span>
+                  </div>
+                </div>
+
+                <!-- 
+                  The Book Button 
+                  We pass data to the modal using HTML5 data-* attributes 
+                -->
+                <button type="button" 
+                        class="btn btn-outline-primary w-100 fw-bold rounded-3 py-2 book-btn"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#bookingModal"
+                        data-doctor-id="<%= doctor._id %>"
+                        data-doctor-name="<%= doctor.user.name %>">
+                  <i class="fa-regular fa-calendar-check me-2"></i> Book Appointment
+                </button>
+              </div>
+
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <!-- Empty State -->
+      <div class="card border-0 shadow-sm rounded-4 text-center p-5 my-5 mx-auto" style="max-width: 550px;">
+        <i class="fa-solid fa-user-doctor text-secondary opacity-50 mb-4" style="font-size: 4rem;"></i>
+        <h4 class="fw-bold text-dark">No Doctors Available</h4>
+        <p class="text-muted small">We are currently onboarding veterinarians to the platform. Please check back later!</p>
+      </div>
+    <% } %>
+
+  </div>
+</div>
+
+<!-- ==========================================
+     THE BOOKING MODAL
+=========================================== -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      
+      <div class="modal-header border-bottom-0 pb-0 px-4 pt-4">
+        <h5 class="modal-title fw-bold text-dark" id="bookingModalLabel">Book Appointment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <!-- Notice the Action Route -->
+      <form action="/api/pet/book-doctor" method="POST">
+        <div class="modal-body px-4 py-3">
+          
+          <p class="text-muted small mb-4">You are booking an appointment with <strong id="modalDoctorName" class="text-primary">Dr. Name</strong>.</p>
+          
+          <!-- Hidden input to send the Doctor's ID to the backend -->
+          <input type="hidden" name="doctorId" id="modalDoctorId" required>
+
+          <!-- 1. Select Pet -->
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">Select Your Pet *</label>
+            <select class="form-select shadow-sm" name="petId" required>
+              <option value="" disabled selected>Choose a pet...</option>
+              <% if (typeof pets !== 'undefined' && pets.length > 0) { %>
+                <% pets.forEach(pet => { %>
+                  <option value="<%= pet._id %>"><%= pet.name %> (<%= pet.species %>)</option>
+                <% }) %>
+              <% } %>
+            </select>
+            <% if (typeof pets === 'undefined' || pets.length === 0) { %>
+              <div class="form-text text-danger mt-1">
+                <i class="fa-solid fa-circle-exclamation me-1"></i> You must add a pet to your profile first.
+              </div>
+            <% } %>
+          </div>
+
+          <!-- 2. Select Time Slot (Populated via JS) -->
+          <div class="mb-3">
+            <label class="form-label fw-bold small text-dark">Select Available Shift *</label>
+            <select class="form-select shadow-sm" name="scheduleId" id="modalScheduleDropdown" required>
+              <!-- Options injected by JavaScript -->
+            </select>
+            <div id="noSchedulesWarning" class="form-text text-danger mt-1 d-none">
+              <i class="fa-solid fa-circle-exclamation me-1"></i> This doctor has no available shifts.
+            </div>
+          </div>
+
+          <!-- 3. Reason for Visit -->
+          <div class="mb-2">
+            <label class="form-label fw-bold small text-dark">Reason for Visit *</label>
+            <textarea class="form-control shadow-sm" name="reason" rows="2" placeholder="e.g., Routine checkup, vaccination, or vomiting..." required></textarea>
+          </div>
+
+        </div>
+        
+        <div class="modal-footer border-top-0 px-4 pb-4 pt-0">
+          <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm" id="confirmBookBtn">Confirm Booking</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     FRONTEND JAVASCRIPT LOGIC
+=========================================== -->
+<script>
+  // 1. We pass the database schedules array from the Node Backend into Frontend JavaScript!
+  // The <%- %> tag allows raw JSON injection. 
+  const allSchedules = <%- JSON.stringify(typeof schedules !== 'undefined' ? schedules : []) %>;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const bookingModal = document.getElementById('bookingModal');
+    
+    // Listen for the modal opening
+    bookingModal.addEventListener('show.bs.modal', function (event) {
+      
+      // Get the button that triggered the modal
+      const button = event.relatedTarget;
+      
+      // Extract info from data-* attributes
+      const doctorId = button.getAttribute('data-doctor-id');
+      const doctorName = button.getAttribute('data-doctor-name');
+      
+      // Update the Modal UI
+      document.getElementById('modalDoctorName').textContent = 'Dr. ' + doctorName;
+      document.getElementById('modalDoctorId').value = doctorId;
+      
+      // Filter schedules to ONLY show shifts belonging to this specific doctor
+      const doctorSchedules = allSchedules.filter(s => s.doctor === doctorId && s.bookedCount < s.maxPatients);
+      
+      const dropdown = document.getElementById('modalScheduleDropdown');
+      const warning = document.getElementById('noSchedulesWarning');
+      const submitBtn = document.getElementById('confirmBookBtn');
+      
+      // Clear previous options
+      dropdown.innerHTML = '<option value="" disabled selected>Choose a time slot...</option>';
+      
+      if (doctorSchedules.length > 0) {
+        // Populate the dropdown with valid shifts
+        doctorSchedules.forEach(schedule => {
+          // Format date nicely (e.g., "Mon, Apr 24, 2026")
+          const dateObj = new Date(schedule.date);
+          const dateString = dateObj.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+          
+          const option = document.createElement('option');
+          option.value = schedule._id;
+          // Looks like: "Mon, Apr 24 | 10:00 - 14:00 (5/20 tokens booked)"
+          option.textContent = `${dateString} | ${schedule.startTime} - ${schedule.endTime} (${schedule.bookedCount}/${schedule.maxPatients} tokens booked)`;
+          
+          dropdown.appendChild(option);
+        });
+        
+        dropdown.disabled = false;
+        warning.classList.add('d-none');
+        submitBtn.disabled = false;
+      } else {
+        // Lock the form if the doctor is fully booked or has no shifts
+        dropdown.disabled = true;
+        warning.classList.remove('d-none');
+        submitBtn.disabled = true;
+      }
+    });
+  });
+</script>
+
+<%- include('./partials/footer') %>

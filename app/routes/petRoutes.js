@@ -29,5 +29,8 @@ routes.post(
 
 routes.get("/owner/profile", authCheck, petController.renderOwnerProfile);
 routes.get("/owner/pets", authCheck, petController.myPet);
+routes.get("/appointements", authCheck, petController.getMyAppointments);
+routes.get("/view/book-doctor", authCheck, petController.getDoctorsDirectory);
+routes.post("/book-doctor", authCheck, petController.bookAppointment);
 
 module.exports = routes;

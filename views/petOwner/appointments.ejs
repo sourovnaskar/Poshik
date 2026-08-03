@@ -1,0 +1,154 @@
+<%- include('./partials/header') %>
+<%- include('./partials/sidebar') %>
+
+<!-- The wrapper from your header usually ends here, so we continue with main-content -->
+<div class="main-content d-flex flex-column min-vh-100">
+  
+  <%- include('./partials/navbar') %>
+  <%- include('./partials/flash') %>
+  
+  <div class="container-fluid py-4">
+    
+    <!-- Page Header -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+      <div>
+        <h2 class="fw-bold mb-1 text-dark">My Appointments</h2>
+        <p class="text-muted small mb-0">Manage your upcoming and past veterinary visits.</p>
+      </div>
+      <div>
+        <a href="/api/pet/view/book-doctor" class="btn btn-primary fw-bold shadow-sm px-4 py-2 w-100 text-nowrap">
+          <i class="fa-solid fa-plus me-2"></i> Book New Doctor
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <% if (typeof appointments !== 'undefined' && appointments.length > 0) { %>
+      <div class="row g-4">
+        
+        <% appointments.forEach(appointment => { %>
+          <% 
+            const d = new Date(appointment.appointmentDate);
+            const formattedDate = d.toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+            
+            let badgeClass = "bg-secondary";
+            if (appointment.status === 'Confirmed') { badgeClass = "bg-success text-white"; }
+            if (appointment.status === 'Pending') { badgeClass = "bg-warning text-dark"; }
+            if (appointment.status === 'Cancelled' || appointment.status === 'Rejected') { badgeClass = "bg-danger text-white"; }
+          %>
+
+          <div class="col-12 col-lg-6 col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
+              
+              <!-- Status Badge -->
+              <div class="position-absolute top-0 end-0 m-3">
+                <span class="badge <%= badgeClass %> px-3 py-2 rounded-pill shadow-sm">
+                  <%= appointment.status %>
+                </span>
+              </div>
+
+              <!-- Card Header -->
+              <div class="card-header bg-white border-bottom p-4 d-flex align-items-start gap-3">
+                <!-- Token Box -->
+                <div class="border rounded-3 p-2 text-center shadow-sm" style="min-width: 75px; background-color: #f8f9fa;">
+                  <span class="d-block text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Token</span>
+                  <span class="d-block fw-bolder fs-4 text-primary">#<%= appointment.tokenNumber %></span>
+                </div>
+                
+                <div class="pt-1 pe-4">
+                  <h5 class="fw-bold mb-1 text-dark text-truncate" title="Dr. <%= appointment.doctorUser.name %>">
+                    Dr. <%= appointment.doctorUser.name %>
+                  </h5>
+                  <p class="text-primary small fw-medium mb-0"><%= appointment.doctorProfile.specialization %></p>
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body bg-light p-4">
+                <div class="d-flex flex-column gap-3 small">
+                  
+                  <div class="d-flex align-items-start gap-3">
+                    <i class="fa-solid fa-paw text-muted mt-1" style="width: 16px;"></i>
+                    <div>
+                      <span class="d-block text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem;">Patient (Pet)</span>
+                      <span class="fw-medium text-dark"><%= appointment.petDetails.name %></span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-start gap-3">
+                    <i class="fa-regular fa-calendar text-muted mt-1" style="width: 16px;"></i>
+                    <div>
+                      <span class="d-block text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem;">Date & Time</span>
+                      <span class="fw-medium text-dark d-block"><%= formattedDate %></span>
+                      <span class="text-secondary"><%= appointment.scheduleDetails.startTime %> - <%= appointment.scheduleDetails.endTime %></span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-start gap-3">
+                    <i class="fa-solid fa-location-dot text-muted mt-1" style="width: 16px;"></i>
+                    <div>
+                      <span class="d-block text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem;">Clinic Address</span>
+                      <span class="text-secondary d-block" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                        <%= appointment.doctorProfile.clinicAddress %>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="d-flex align-items-start gap-3">
+                    <i class="fa-solid fa-notes-medical text-muted mt-1" style="width: 16px;"></i>
+                    <div>
+                      <span class="d-block text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem;">Reason</span>
+                      <span class="text-secondary fst-italic">"<%= appointment.reason %>"</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Card Footer -->
+              <div class="card-footer bg-white border-top p-4 d-flex align-items-center justify-content-between">
+                <div>
+                  <span class="d-block text-muted text-uppercase fw-semibold mb-1" style="font-size: 0.7rem;">Consultation Fee</span>
+                  <span class="fw-bold text-dark fs-5">₹<%= appointment.consultationFee %></span>
+                </div>
+                
+                <% if (appointment.status === 'Confirmed' || appointment.status === 'Pending') { %>
+                  <form action="/api/user/appointment/cancel/<%= appointment._id %>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');" class="m-0">
+                    <button type="submit" class="btn btn-outline-danger btn-sm fw-bold px-3 py-2 rounded-3 transition-all hover-shadow">
+                      Cancel Visit
+                    </button>
+                  </form>
+                <% } %>
+              </div>
+
+            </div>
+          </div>
+        <% }) %>
+
+      </div>
+
+    <% } else { %>
+      
+      <!-- FIXED EMPTY STATE -->
+      <div class="card border-0 shadow-sm rounded-4 text-center p-5 my-5 mx-auto" style="max-width: 550px;">
+        <div class="mb-4">
+          <!-- Using FontAwesome instead of SVG prevents the scaling bug -->
+          <i class="fa-regular fa-calendar-xmark text-secondary opacity-50" style="font-size: 5rem;"></i>
+        </div>
+        <h3 class="fw-bold text-dark mb-2">No Appointments Found</h3>
+        <p class="text-muted small mb-4 px-md-4">
+          You haven't booked any veterinary visits yet. Keep your pets healthy by scheduling a routine checkup today.
+        </p>
+        <div>
+          <a href="/api/pet/view/book-doctor" class="btn btn-primary fw-bold px-5 py-2 rounded-3 shadow-sm">
+            Find a Doctor
+          </a>
+        </div>
+      </div>
+
+    <% } %>
+
+  </div>
+</div>
+
+<%- include('./partials/footer') %>
