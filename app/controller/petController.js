@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const Appointment = require("../models/appointmentModel");
 const DoctorSchedule = require("../models/doctorScheduleModel");
 const Doctor = require("../models/doctorModel");
-const mongoose=require('mongoose')
+const mongoose = require("mongoose");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs/promises");
 class PetController {
@@ -374,116 +374,125 @@ class PetController {
     }
   }
 
+  async getDoctorsDirectory(req, res) {
+    try {
+      const userId = req.user.id;
 
+      // Get today's date at midnight to filter out past shifts
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-async getDoctorsDirectory  (req, res) {
-  try {
-    const userId = req.user.id;
+      // Run all three database queries CONCURRENTLY for maximum performance
+      const [doctors, pets, schedules] = await Promise.all([
+        // 1. Fetch all doctors and populate their real name from the User collection
+        Doctor.find({}).populate("user", "name"),
 
-    // Get today's date at midnight to filter out past shifts
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+        // 2. Fetch only the pets belonging to the currently logged-in user
+        Pet.find({ owner: userId }),
 
-    // Run all three database queries CONCURRENTLY for maximum performance
-    const [doctors, pets, schedules] = await Promise.all([
-      
-      // 1. Fetch all doctors and populate their real name from the User collection
-      Doctor.find({}).populate("user", "name"),
-      
-      // 2. Fetch only the pets belonging to the currently logged-in user
-      Pet.find({ owner: userId }),
-      
-      // 3. Fetch all upcoming schedules (ignore past dates)
-      DoctorSchedule.find({ date: { $gte: today } })
-                    .sort({ date: 1, startTime: 1 })
-    ]);
+        // 3. Fetch all upcoming schedules (ignore past dates)
+        DoctorSchedule.find({ date: { $gte: today } }).sort({
+          date: 1,
+          startTime: 1,
+        }),
+      ]);
 
-    // Render the EJS page and pass the three arrays to the frontend
-    res.render("petOwner/book-doctor", {
-      user: req.user,
-      doctors: doctors,
-      pets: pets,
-      schedules: schedules
-    });
-
-  } catch (error) {
-    console.error("Error fetching doctors directory:", error);
-    req.flash("error", "Could not load the booking directory at this time.");
-    return res.redirect("/api/user/dashboard");
+      // Render the EJS page and pass the three arrays to the frontend
+      res.render("petOwner/book-doctor", {
+        user: req.user,
+        doctors: doctors,
+        pets: pets,
+        schedules: schedules,
+      });
+    } catch (error) {
+      console.error("Error fetching doctors directory:", error);
+      req.flash("error", "Could not load the booking directory at this time.");
+      return res.redirect("/api/user/dashboard");
+    }
   }
-};
 
-async bookAppointment (req, res) {
-  try {
-    const userId = req.user.id; // The logged-in Pet Owner
-    
-    // Data coming from the frontend form in "Book Doctor"
-    const { doctorId, scheduleId, petId, reason } = req.body;
+  async bookAppointment(req, res) {
+    try {
+      const userId = req.user.id; // The logged-in Pet Owner
 
-    // 1. Basic Validation
-    if (!doctorId || !scheduleId || !petId || !reason) {
-      req.flash("error", "All fields are required to book an appointment.");
-      return res.redirect("back"); // Sends them back to the booking form
-    }
+      // Data coming from the frontend form in "Book Doctor"
+      const { doctorId, scheduleId, petId, reason } = req.body;
 
-    // 2. Fetch the Schedule and Doctor details
-    const schedule = await DoctorSchedule.findById(scheduleId);
-    const doctor = await Doctor.findById(doctorId);
+      // 1. Basic Validation
+      if (!doctorId || !scheduleId || !petId || !reason) {
+        req.flash("error", "All fields are required to book an appointment.");
+        return res.redirect("back"); // Sends them back to the booking form
+      }
 
-    if (!schedule || !doctor) {
-      req.flash("error", "Invalid schedule or doctor selected.");
+      // 2. Fetch the Schedule and Doctor details
+      const schedule = await DoctorSchedule.findById(scheduleId);
+      const doctor = await Doctor.findById(doctorId);
+
+      if (!schedule || !doctor) {
+        req.flash("error", "Invalid schedule or doctor selected.");
+        return res.redirect("/api/pet/view/book-doctor");
+      }
+
+      // 3. CRITICAL: Check if the shift is already full
+      if (schedule.bookedCount >= schedule.maxPatients) {
+        req.flash(
+          "error",
+          "Sorry, this shift is fully booked. Please select another time.",
+        );
+        return res.redirect("/api/pet/view/book-doctor");
+      }
+
+      // 4. ATOMIC UPDATE: Increment bookedCount and get the Token Number
+      // We use $inc to prevent "Race Conditions" (two users clicking book at the exact same millisecond)
+      const updatedSchedule = await DoctorSchedule.findByIdAndUpdate(
+        scheduleId,
+        { $inc: { bookedCount: 1 } },
+        { new: true }, // Returns the updated document
+      );
+
+      const generatedTokenNumber = updatedSchedule.bookedCount;
+
+      // 5. Create the Appointment Document!
+      const newAppointment = new Appointment({
+        owner: userId,
+        pet: petId,
+        doctor: doctorId,
+        schedule: scheduleId,
+        tokenNumber: generatedTokenNumber, // Assign the token number!
+        appointmentDate: schedule.date,
+        reason: reason,
+        consultationFee: doctor.consultationFee, // Pulled dynamically from the Doctor's profile
+        status: "Confirmed",
+      });
+
+      await newAppointment.save();
+
+      req.flash(
+        "success",
+        `Appointment Confirmed! You are Token #${generatedTokenNumber}`,
+      );
+
+      // Redirect them to the "Appointments" sidebar option so they can see their ticket
       return res.redirect("/api/pet/view/book-doctor");
+    } catch (error) {
+      console.error("Booking Error:", error);
+
+      // Check for the compound unique index error we added earlier (booking same pet twice in one shift)
+      if (error.code === 11000) {
+        req.flash(
+          "error",
+          "You have already booked an appointment for this pet in this shift.",
+        );
+      } else {
+        req.flash(
+          "error",
+          "An error occurred while booking. Please try again.",
+        );
+      }
+
+      return res.redirect("back");
     }
-
-    // 3. CRITICAL: Check if the shift is already full
-    if (schedule.bookedCount >= schedule.maxPatients) {
-      req.flash("error", "Sorry, this shift is fully booked. Please select another time.");
-      return res.redirect("/api/pet/view/book-doctor");
-    }
-
-    // 4. ATOMIC UPDATE: Increment bookedCount and get the Token Number
-    // We use $inc to prevent "Race Conditions" (two users clicking book at the exact same millisecond)
-    const updatedSchedule = await DoctorSchedule.findByIdAndUpdate(
-      scheduleId,
-      { $inc: { bookedCount: 1 } },
-      { new: true } // Returns the updated document
-    );
-
-    const generatedTokenNumber = updatedSchedule.bookedCount;
-
-    // 5. Create the Appointment Document!
-    const newAppointment = new Appointment({
-      owner: userId,
-      pet: petId,
-      doctor: doctorId,
-      schedule: scheduleId,
-      tokenNumber: generatedTokenNumber, // Assign the token number!
-      appointmentDate: schedule.date,
-      reason: reason,
-      consultationFee: doctor.consultationFee, // Pulled dynamically from the Doctor's profile
-      status: "Confirmed"
-    });
-
-    await newAppointment.save();
-
-    req.flash("success", `Appointment Confirmed! You are Token #${generatedTokenNumber}`);
-    
-    // Redirect them to the "Appointments" sidebar option so they can see their ticket
-    return res.redirect("/api/pet/view/book-doctor");
-
-  } catch (error) {
-    console.error("Booking Error:", error);
-    
-    // Check for the compound unique index error we added earlier (booking same pet twice in one shift)
-    if (error.code === 11000) {
-      req.flash("error", "You have already booked an appointment for this pet in this shift.");
-    } else {
-      req.flash("error", "An error occurred while booking. Please try again.");
-    }
-    
-    return res.redirect("back");
   }
-};
 }
 
 module.exports = new PetController();

@@ -1,0 +1,186 @@
+<%- include('./partials/header') %>
+
+<!-- Custom CSS for a Professional Onboarding Look -->
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+    .kyc-container {
+        min-height: 100vh;
+        padding: 3rem 1rem;
+    }
+    .kyc-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15);
+        border: none;
+        padding: 2.5rem;
+        max-width: 750px;
+        margin: 0 auto;
+    }
+    .kyc-header-icon {
+        width: 64px;
+        height: 64px;
+        background-color: #e7f1ff;
+        color: #0d6efd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem auto;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+    .form-control, .form-select {
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        background-color: #f8f9fa;
+        font-size: 0.95rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+    .form-control::file-selector-button {
+        background-color: #e9ecef;
+        border: none;
+        border-right: 1px solid #ced4da;
+        padding: 0.75rem 1rem;
+        margin: -0.75rem 1rem -0.75rem -1rem;
+        color: #495057;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .form-control::file-selector-button:hover {
+        background-color: #dde0e3;
+    }
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+    }
+    .section-divider {
+        height: 1px;
+        background-color: #e9ecef;
+        margin: 2rem 0;
+    }
+    .btn-submit {
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        font-size: 1.05rem;
+        border-radius: 8px;
+    }
+</style>
+
+<!-- Top Navbar (Optional, includes logout if they want to leave) -->
+<%- include('./partials/navbar') %>
+
+<div class="kyc-container d-flex align-items-center">
+    <div class="container w-100">
+        
+        <!-- Flash Messages (Errors/Success) -->
+        <div class="mx-auto" style="max-width: 750px;">
+            <%- include('./partials/flash') %>
+        </div>
+
+        <!-- Main KYC Card -->
+        <div class="kyc-card">
+            
+            <div class="text-center mb-4">
+                <div class="kyc-header-icon">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <h2 class="fw-bold text-dark">Shop Verification (KYC)</h2>
+                <p class="text-muted">Submit your official documents to activate your seller dashboard.</p>
+            </div>
+
+            <form action="/api/shop/kyc/submit" method="POST" enctype="multipart/form-data">
+                
+                <!-- 1. Identity Proof Section -->
+                <div class="section-title">
+                    <i class="bi bi-person-badge fs-4 text-primary me-2"></i> Identity Verification
+                </div>
+                <div class="row g-3 mb-2">
+                    <div class="col-md-5">
+                        <label for="idType" class="form-label">Select ID Type <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idType" name="idType" required>
+                            <option value="" selected disabled>Choose ID Type...</option>
+                            <option value="Aadhaar">Aadhaar Card</option>
+                            <option value="Pan">PAN Card</option>
+                            <option value="Voter">Voter ID</option>
+                        </select>
+                    </div>
+                    <div class="col-md-7">
+                        <label for="idProof" class="form-label">Upload Document <span class="text-danger">*</span></label>
+                        <input class="form-control" type="file" id="idProof" name="idProof" required accept=".pdf, .jpg, .png, .jpeg">
+                        <div class="form-text small">Accepted formats: JPG, PNG, PDF. Max size: 5MB.</div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- 2. Address Proof Section -->
+                <div class="section-title">
+                    <i class="bi bi-geo-alt-fill fs-4 text-primary me-2"></i> Address Verification
+                </div>
+                <div class="row g-3 mb-2">
+                    <div class="col-md-5">
+                        <label for="addressProofType" class="form-label">Select Address Proof <span class="text-danger">*</span></label>
+                        <!-- Based on your model enum: ["Aadhaar", "Voter", "Pan"] but you can adjust these labels -->
+                        <select class="form-select" id="addressProofType" name="addressProofType" required>
+                            <option value="" selected disabled>Choose Document...</option>
+                            <option value="Aadhaar">Aadhaar Card (Address side)</option>
+                            <option value="Voter">Voter ID</option>
+                            <option value="Pan">PAN Card (If address present)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-7">
+                        <label for="addressProof" class="form-label">Upload Document <span class="text-danger">*</span></label>
+                        <input class="form-control" type="file" id="addressProof" name="addressProof" required accept=".pdf, .jpg, .png, .jpeg">
+                        <div class="form-text small">Ensure the address is clearly visible.</div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- 3. Business Documents Section -->
+                <div class="section-title">
+                    <i class="bi bi-briefcase-fill fs-4 text-primary me-2"></i> Business Details <span class="text-muted fw-normal fs-6 ms-1">(Optional)</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="license" class="form-label">Trade License</label>
+                        <input class="form-control" type="file" id="license" name="license" accept=".pdf, .jpg, .png, .jpeg">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="certificate" class="form-label">Registration Certificate</label>
+                        <input class="form-control" type="file" id="certificate" name="certificate" accept=".pdf, .jpg, .png, .jpeg">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary btn-submit">
+                        <i class="bi bi-cloud-arrow-up-fill me-2"></i> Submit Documents for Review
+                    </button>
+                </div>
+                <p class="text-center text-muted small mt-3 mb-0">
+                    <i class="bi bi-lock-fill"></i> Your information is securely encrypted.
+                </p>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>

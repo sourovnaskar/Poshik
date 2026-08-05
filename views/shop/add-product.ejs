@@ -1,0 +1,285 @@
+<%- include('./partials/header') %>
+
+    <style>
+        /* Styling for the multiple image preview area */
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .preview-image-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .preview-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+
+    <%- include('./partials/navbar') %>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Include Sidebar -->
+                <%- include('./partials/sidebar') %>
+
+                    <!-- Main Content Area -->
+                    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 bg-light min-vh-100">
+
+                        <!-- Breadcrumb / Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                            <div>
+                                <h1 class="h3 fw-bold text-dark mb-1">Add New Product</h1>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="/api/shop/dashboard"
+                                                class="text-decoration-none">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="/api/shop/products"
+                                                class="text-decoration-none">Products</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Add New</li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <a href="/api/shop/products" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Products
+                            </a>
+                        </div>
+
+                        <!-- Flash Messages -->
+                        <div class="row">
+                            <div class="col-12">
+                                <%- include('./partials/flash') %>
+                            </div>
+                        </div>
+
+                        <!-- Product Form Form -->
+                        <form action="/api/shop/products/add" method="POST" enctype="multipart/form-data">
+                            <div class="row g-4">
+
+                                <!-- Left Column: Basic Details -->
+                                <div class="col-lg-8">
+                                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                        <div class="card-body p-4">
+                                            <h5 class="fw-bold text-dark mb-4"><i
+                                                    class="bi bi-info-circle me-2 text-primary"></i>Basic Information
+                                            </h5>
+
+                                            <!-- Product Name -->
+                                            <div class="mb-4">
+                                                <label for="name" class="form-label fw-bold text-dark">Product Name
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control bg-light" id="name" name="name"
+                                                    required maxlength="200"
+                                                    placeholder="e.g., Premium Royal Canin Dog Food - 3kg">
+                                            </div>
+
+                                            <!-- Description -->
+                                            <div class="mb-3">
+                                                <label for="description" class="form-label fw-bold text-dark">Product
+                                                    Description</label>
+                                                <textarea class="form-control bg-light" id="description"
+                                                    name="description" rows="5" maxlength="2000"
+                                                    placeholder="Describe the product features, ingredients, or usage instructions..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Media / Images -->
+                                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                        <div class="card-body p-4">
+                                            <h5 class="fw-bold text-dark mb-4"><i
+                                                    class="bi bi-images me-2 text-primary"></i>Product Images <span
+                                                    class="text-danger">*</span></h5>
+
+                                            <div class="p-4 border rounded-3 bg-light text-center border-dashed">
+                                                <i
+                                                    class="bi bi-cloud-arrow-up display-4 text-secondary mb-3 d-block"></i>
+                                                <!-- Notice the "multiple" attribute allowing multiple image selection -->
+                                                <input class="form-control" type="file" id="images" name="images"
+                                                    accept=".jpg, .jpeg, .png, .webp" multiple required
+                                                    onchange="previewImages(event)">
+                                                <div class="form-text mt-2">You can select multiple images (Max 4). The
+                                                    first image will be the cover.</div>
+
+                                                <!-- Dynamic Preview Area -->
+                                                <div class="preview-container justify-content-center"
+                                                    id="imagePreviewContainer"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column: Pricing & Inventory -->
+                                <div class="col-lg-4">
+
+                                    <!-- Organization & Category -->
+                                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                        <div class="card-body p-4">
+                                            <h5 class="fw-bold text-dark mb-3"><i
+                                                    class="bi bi-tags me-2 text-primary"></i>Organization</h5>
+
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label fw-bold text-dark">Category
+                                                    <span class="text-danger">*</span></label>
+                                                <select class="form-select bg-light" id="category" name="category"
+                                                    required>
+                                                    <option value="" selected disabled>Select a category...</option>
+                                                    <!-- Dynamically loop through the categories passed from the controller -->
+                                                    <% if (typeof categories !=='undefined' && categories.length> 0) {
+                                                        %>
+                                                        <% categories.forEach(cat=> { %>
+                                                            <option value="<%= cat._id %>">
+                                                                <%= cat.name %>
+                                                            </option>
+                                                            <% }) %>
+                                                                <% } %>
+                                                </select>
+                                                <% if (typeof categories==='undefined' || categories.length===0) { %>
+                                                    <div class="form-text text-danger mt-1"><i
+                                                            class="bi bi-exclamation-triangle"></i> You must create a
+                                                        category first.</div>
+                                                    <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pricing -->
+                                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                        <div class="card-body p-4">
+                                            <h5 class="fw-bold text-dark mb-3"><i
+                                                    class="bi bi-currency-rupee me-2 text-primary"></i>Pricing</h5>
+
+                                            <div class="mb-3">
+                                                <label for="mrp" class="form-label fw-bold text-dark">MRP (₹) <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" class="form-control bg-light" id="mrp" name="mrp"
+                                                    required min="0" step="0.01" oninput="calculateDiscount()">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="price" class="form-label fw-bold text-dark">Selling Price
+                                                    (₹) <span class="text-danger">*</span></label>
+                                                <input type="number" class="form-control bg-light" id="price"
+                                                    name="price" required min="0" step="0.01"
+                                                    oninput="calculateDiscount()">
+                                            </div>
+
+                                            <div
+                                                class="p-3 bg-success-subtle rounded-3 border border-success-subtle d-flex justify-content-between align-items-center">
+                                                <span class="text-success fw-bold small">Discount Applied:</span>
+                                                <span class="badge bg-success fs-6" id="discountBadge">0%</span>
+                                                <!-- Hidden input to send discount % to backend if needed -->
+                                                <input type="hidden" id="discountPercentage" name="discountPercentage"
+                                                    value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Inventory -->
+                                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                                        <div class="card-body p-4">
+                                            <h5 class="fw-bold text-dark mb-3"><i
+                                                    class="bi bi-box-seam me-2 text-primary"></i>Inventory</h5>
+
+                                            <div class="mb-3">
+                                                <label for="stock" class="form-label fw-bold text-dark">Available Stock
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="number" class="form-control bg-light" id="stock"
+                                                    name="stock" required min="0" value="0">
+                                            </div>
+
+                                            <div class="form-check form-switch mt-4">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="isActive" name="isActive" checked value="true">
+                                                <label class="form-check-label fw-medium text-dark"
+                                                    for="isActive">Product is Active (Visible)</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Sticky Footer Button -->
+                            <div class="bg-white p-3 rounded-3 shadow-sm border mt-2 d-flex justify-content-end gap-2 sticky-bottom z-1"
+                                style="bottom: 1rem;">
+                                <a href="/api/shop/products" class="btn btn-light fw-bold px-4 border">Cancel</a>
+                                <button type="submit" class="btn btn-primary fw-bold px-5 shadow-sm">
+                                    <i class="bi bi-check2-circle me-1"></i> Publish Product
+                                </button>
+                            </div>
+                        </form>
+
+                    </main>
+            </div>
+        </div>
+
+        <script>
+            // 1. Multiple Image Preview Logic
+            function previewImages(event) {
+                const previewContainer = document.getElementById('imagePreviewContainer');
+                previewContainer.innerHTML = ""; // Clear existing previews
+
+                const files = event.target.files;
+
+                if (files) {
+                    // Limit preview to max 4 images to match UI suggestion
+                    const maxFiles = Math.min(files.length, 4);
+
+                    for (let i = 0; i < maxFiles; i++) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const wrapper = document.createElement('div');
+                            wrapper.className = 'preview-image-wrapper';
+
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+
+                            wrapper.appendChild(img);
+                            previewContainer.appendChild(wrapper);
+                        }
+                        reader.readAsDataURL(files[i]);
+                    }
+                }
+            }
+
+            // 2. Auto-calculate Discount Percentage visually
+            function calculateDiscount() {
+                const mrpInput = document.getElementById('mrp').value;
+                const priceInput = document.getElementById('price').value;
+                const badge = document.getElementById('discountBadge');
+                const hiddenInput = document.getElementById('discountPercentage');
+
+                const mrp = parseFloat(mrpInput);
+                const price = parseFloat(priceInput);
+
+                if (!isNaN(mrp) && !isNaN(price) && mrp > 0) {
+                    if (price > mrp) {
+                        badge.textContent = "Invalid Price";
+                        badge.className = "badge bg-danger fs-6";
+                        hiddenInput.value = 0;
+                    } else {
+                        const discount = Math.round(((mrp - price) / mrp) * 100);
+                        badge.textContent = discount + "% Off";
+                        badge.className = "badge bg-success fs-6";
+                        hiddenInput.value = discount;
+                    }
+                } else {
+                    badge.textContent = "0%";
+                    badge.className = "badge bg-success fs-6";
+                    hiddenInput.value = 0;
+                }
+            }
+        </script>
+
+        <%- include('./partials/footer') %>

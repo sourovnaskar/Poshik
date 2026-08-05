@@ -156,7 +156,7 @@ class AuthController {
       const redirectUrls = {
         Admin: "/admin/dashboard",
         "Super Admin": "/super-admin/dashboard",
-        Shop: "/shop/dashboard",
+        Shop: "/api/shop/dashboard",
         Owner: "/api/pet/dashboard",
         Doctor: "/api/doctor/dashboard",
       };

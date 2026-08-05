@@ -68,4 +68,48 @@ const PetSchema = Joi.object({
 
   medicalHistory: Joi.string().optional(),
 });
-module.exports = { registerSchema, loginSchema, PetSchema };
+
+const shopDetailsSchema=Joi.object({
+shopName: Joi.string()
+    .trim()
+    .max(150)
+    .required()
+    .messages({
+      "string.base": "Shop name must be a string text.",
+      "string.empty": "Shop name is required.",
+      "string.max": "Shop name cannot exceed 150 characters.",
+      "any.required": "Shop name is a mandatory field.",
+    }),
+
+  description: Joi.string()
+    .trim()
+    .max(1000)
+    .allow("", null) // Allows empty string if the user submits the form without a description
+    .optional()
+    .messages({
+      "string.max": "Description cannot exceed 1000 characters.",
+    }),
+
+  phone: Joi.string()
+    .trim()
+    .pattern(/^[0-9+\-\s()]+$/) // Basic validation for phone numbers (allows +, -, spaces, and brackets)
+    .min(10)
+    .max(15)
+    .required()
+    .messages({
+      "string.empty": "Business phone number is required.",
+      "string.pattern.base": "Please provide a valid phone number.",
+      "string.min": "Phone number must be at least 10 characters long.",
+      "string.max": "Phone number cannot exceed 15 characters.",
+      "any.required": "Business phone number is a mandatory field.",
+    }),
+
+  address: Joi.string()
+    .trim()
+    .required()
+    .messages({
+      "string.empty": "Complete business address is required.",
+      "any.required": "Address is a mandatory field.",
+    }),
+})
+module.exports = { registerSchema, loginSchema, PetSchema,shopDetailsSchema };

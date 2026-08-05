@@ -11,4 +11,7 @@ routes.use("/api/pet", petRoutes);
 const doctorRoutes = require("./doctorRoutes");
 routes.use("/api/doctor", doctorRoutes);
 
+const shopRoutes = require("./shopRoutes");
+routes.use("/api/shop", shopRoutes);
+
 module.exports = routes;

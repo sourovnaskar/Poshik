@@ -1,0 +1,213 @@
+<%- include('./partials/header') %>
+
+<!-- Custom CSS for Profile Setup -->
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+    .profile-container {
+        min-height: calc(100vh - 60px); /* Adjust based on navbar height */
+        padding: 3rem 1rem;
+    }
+    .profile-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15);
+        border: none;
+        padding: 2.5rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .profile-header-icon {
+        width: 72px;
+        height: 72px;
+        background-color: #e7f1ff;
+        color: #0d6efd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 1.5rem auto;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        background-color: #f8f9fa;
+        font-size: 0.95rem;
+    }
+    .form-control:focus {
+        border-color: #86b7fe;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+    .form-control::file-selector-button {
+        background-color: #e9ecef;
+        border: none;
+        border-right: 1px solid #ced4da;
+        padding: 0.75rem 1rem;
+        margin: -0.75rem 1rem -0.75rem -1rem;
+        color: #495057;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .form-control::file-selector-button:hover {
+        background-color: #dde0e3;
+    }
+    .btn-submit {
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        font-size: 1.05rem;
+        border-radius: 8px;
+    }
+    .logo-preview-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        border: 2px dashed #ced4da;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        margin-bottom: 1rem;
+    }
+    .logo-preview-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none; /* Hidden until image is selected */
+    }
+</style>
+
+<%- include('./partials/navbar') %>
+
+<div class="profile-container d-flex align-items-center">
+    <div class="container w-100">
+        
+        <!-- Flash Messages -->
+        <div class="mx-auto" style="max-width: 800px;">
+            <%- include('./partials/flash') %>
+        </div>
+
+        <div class="profile-card">
+            
+            <div class="text-center mb-4">
+                <div class="profile-header-icon">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <h2 class="fw-bold text-dark">Setup Your Shop Profile</h2>
+                <p class="text-muted">Fill in your shop details to start listing your products.</p>
+            </div>
+
+            <!-- Shop Profile Form -->
+            <form action="/api/shop/submit/form" method="POST" enctype="multipart/form-data">
+                
+                <!-- Logo Upload Section -->
+                <div class="d-flex flex-column align-items-center mb-4 pb-3 border-bottom">
+                    <div class="logo-preview-container" id="logoPreviewContainer">
+                        <i class="bi bi-image text-muted fs-1" id="logoPlaceholderIcon"></i>
+                        <img src="" alt="Logo Preview" class="logo-preview-image" id="logoPreview">
+                    </div>
+                    <div class="text-center w-100" style="max-width: 400px;">
+                        <label for="logo" class="form-label">Shop Logo (Optional)</label>
+                        <input class="form-control" type="file" id="logo" name="logo" accept=".jpg, .jpeg, .png" onchange="previewImage(event)">
+                        <div class="form-text small">Square image recommended. Max 2MB.</div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- Shop Name -->
+                    <div class="col-md-6">
+                        <label for="shopName" class="form-label">Shop Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="shopName" name="shopName" required maxlength="150" placeholder="e.g., The Tech Store">
+                    </div>
+                    
+                    <!-- Phone Number -->
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Business Phone Number <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" id="phone" name="phone" required placeholder="+91 XXXXX XXXXX">
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-4">
+                    <label for="address" class="form-label">Complete Business Address <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="address" name="address" rows="3" required placeholder="Street address, City, State, ZIP code"></textarea>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <label for="description" class="form-label">Shop Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4" maxlength="1000" placeholder="Tell customers what your shop is about, what you sell, and what makes you unique..."></textarea>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">Brief overview of your business.</small>
+                        <small class="text-muted" id="charCount">0/1000</small>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary btn-submit shadow-sm">
+                        <i class="bi bi-check-circle-fill me-2"></i> Save Profile & Launch Shop
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>
+
+<!-- Scripts for Image Preview and Character Count -->
+<script>
+    // Live Logo Preview
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('logoPreview');
+        const placeholderIcon = document.getElementById('logoPlaceholderIcon');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholderIcon.style.display = 'none';
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = "";
+            preview.style.display = 'none';
+            placeholderIcon.style.display = 'block';
+        }
+    }
+
+    // Character Counter for Description
+    document.addEventListener('DOMContentLoaded', () => {
+        const descInput = document.getElementById('description');
+        const charCount = document.getElementById('charCount');
+        
+        if(descInput && charCount) {
+            descInput.addEventListener('input', function() {
+                const currentLength = this.value.length;
+                charCount.textContent = `${currentLength}/1000`;
+                
+                if (currentLength >= 1000) {
+                    charCount.classList.add('text-danger');
+                } else {
+                    charCount.classList.remove('text-danger');
+                }
+            });
+        }
+    });
+</script>

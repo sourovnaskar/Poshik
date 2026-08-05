@@ -1,0 +1,97 @@
+<style>
+  /* Custom hover effect for sidebar links */
+  .shop-nav-link {
+    transition: background-color 0.2s ease-in-out;
+  }
+  .shop-nav-link:hover:not(.disabled-link) {
+    background-color: #f8f9fa; /* Bootstrap light gray */
+  }
+  .disabled-link {
+    cursor: not-allowed;
+    pointer-events: none; /* Prevents clicking entirely */
+  }
+</style>
+
+<!-- Sidebar (Fixed on desktop, collapsible on mobile) -->
+<div class="col-md-3 col-lg-2 p-0 bg-white shadow-sm border-end position-fixed h-100 d-flex flex-column" id="sidebar" style="z-index: 40; top: 0; left: 0;">
+  
+  <!-- Logo Section -->
+  <div class="p-4 d-none d-md-block">
+    <h2 class="h4 fw-bold text-primary mb-0">Poshik Vendor</h2>
+  </div>
+
+  <!-- Navigation Links -->
+  <nav class="nav flex-column px-3 py-2 gap-2 flex-grow-1 overflow-auto mt-3 mt-md-0">
+    
+    <!-- Always Accessible -->
+    <a href="/api/shop/dashboard" class="nav-link d-flex align-items-center text-dark bg-light rounded fw-medium">
+      <i class="bi bi-speedometer2 me-2"></i> Dashboard
+    </a>
+
+    <!-- Dynamic KYC Alerts -->
+    <% if (user.kycStatus === 'Not Submitted' || user.kycStatus === 'Rejected') { %>
+      <a href="/api/shop/kyc/form" class="nav-link d-flex align-items-center text-danger bg-danger-subtle fw-bold rounded mt-2">
+        <span class="me-2">⚠️</span> Submit KYC
+      </a>
+    <% } else if (user.kycStatus === 'Pending') { %>
+      <div class="nav-link d-flex align-items-center text-warning-emphasis bg-warning-subtle fw-bold rounded mt-2">
+        <span class="me-2">⏳</span> KYC Pending Review
+      </div>
+    <% } %>
+
+    <!-- Conditionally Locked Links -->
+    <!-- The user MUST have KYC Approved AND a Shop Profile to unlock these -->
+    <% const isUnlocked = (user.kycStatus === 'Approved' && typeof hasProfile !== 'undefined' && hasProfile); %>
+
+    <a href="<%= isUnlocked ? '/api/shop/get/categories' : '#' %>" 
+       class="nav-link shop-nav-link d-flex justify-content-between align-items-center rounded mt-2 <%= isUnlocked ? 'text-dark' : 'text-muted disabled-link opacity-50' %>">
+      <span><i class="bi bi-tags me-2"></i> Categories</span>
+      <% if (!isUnlocked) { %> <span>🔒</span> <% } %>
+    </a>
+
+    <a href="<%= isUnlocked ? '/api/shop/all/products' : '#' %>" 
+       class="nav-link shop-nav-link d-flex justify-content-between align-items-center rounded <%= isUnlocked ? 'text-dark' : 'text-muted disabled-link opacity-50' %>">
+      <span><i class="bi bi-box-seam me-2"></i> My Products</span>
+      <% if (!isUnlocked) { %> <span>🔒</span> <% } %>
+    </a>
+
+    <a href="<%= isUnlocked ? '/api/shop/orders' : '#' %>" 
+       class="nav-link shop-nav-link d-flex justify-content-between align-items-center rounded <%= isUnlocked ? 'text-dark' : 'text-muted disabled-link opacity-50' %>">
+      <span><i class="bi bi-cart-check me-2"></i> Orders</span>
+      <% if (!isUnlocked) { %> <span>🔒</span> <% } %>
+    </a>
+    
+    <a href="<%= isUnlocked ? '/api/shop/earnings' : '#' %>" 
+       class="nav-link shop-nav-link d-flex justify-content-between align-items-center rounded <%= isUnlocked ? 'text-dark' : 'text-muted disabled-link opacity-50' %>">
+      <span><i class="bi bi-wallet2 me-2"></i> Earnings</span>
+      <% if (!isUnlocked) { %> <span>🔒</span> <% } %>
+    </a>
+
+    <a href="<%= isUnlocked ? '/api/shop/settings' : '#' %>" 
+       class="nav-link shop-nav-link d-flex justify-content-between align-items-center rounded <%= isUnlocked ? 'text-dark' : 'text-muted disabled-link opacity-50' %>">
+      <span><i class="bi bi-gear me-2"></i> Settings</span>
+      <% if (!isUnlocked) { %> <span>🔒</span> <% } %>
+    </a>
+  </nav>
+
+  <!-- User Profile Section -->
+  <div class="p-3 border-top mt-auto bg-white">
+    <div class="d-flex align-items-center gap-3">
+      
+      <!-- Show Shop Logo if it exists, else default avatar -->
+      <img src="<%= (typeof hasProfile !== 'undefined' && hasProfile && shop && shop.logo) ? shop.logo : (user.profileImage || 'https://ui-avatars.com/api/?name=Shop+Owner&background=0D8ABC&color=fff') %>" 
+           alt="Profile" 
+           class="rounded-circle object-fit-cover shadow-sm" 
+           width="45" height="45">
+           
+      <div class="overflow-hidden">
+        <!-- Show Shop Name if it exists, else User Name -->
+        <p class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.95rem;">
+          <%= (typeof hasProfile !== 'undefined' && hasProfile && shop) ? shop.shopName : user.name %>
+        </p>
+        <a href="/api/auth/logout" class="text-danger small text-decoration-none fw-medium">Logout</a>
+      </div>
+      
+    </div>
+  </div>
+</div>
