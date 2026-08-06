@@ -33,4 +33,13 @@ routes.get("/appointements", authCheck, petController.getMyAppointments);
 routes.get("/view/book-doctor", authCheck, petController.getDoctorsDirectory);
 routes.post("/book-doctor", authCheck, petController.bookAppointment);
 
+routes.get("/view/shop", authCheck, petController.petShop);
+routes.get("/view/products/:id", authCheck, petController.products);
+
+// POST route to check and add
+routes.post("/cart/add", authCheck, petController.addToCart);
+
+// POST route to override
+routes.post("/cart/replace", authCheck, petController.replaceCart);
+routes.get("/cart", authCheck, petController.viewCart);
 module.exports = routes;

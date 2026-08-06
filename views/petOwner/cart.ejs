@@ -1,0 +1,184 @@
+<%- include('./partials/header') %>
+    <!-- Include User Sidebar -->
+    <%- include('./partials/sidebar') %>
+        <%- include('./partials/navbar') %>
+
+            <style>
+                .cart-item-img {
+                    width: 80px;
+                    height: 80px;
+                    object-fit: cover;
+                    border-radius: 0.5rem;
+                }
+
+                .qty-btn {
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0;
+                }
+            </style>
+
+            <div class="d-flex bg-light min-vh-100">
+
+
+
+                <!-- Main Content Area -->
+                <main class="flex-grow-1 px-md-4 py-4 mb-5" style="width: 0; overflow-x: hidden;">
+
+                    <h1 class="h3 fw-bold text-dark mb-4">My Cart</h1>
+                    <%- include('./partials/flash') %>
+
+                        <% if (!cart || cart.items.length===0) { %>
+                            <!-- Empty Cart State -->
+                            <div class="bg-white rounded-4 shadow-sm text-center py-5 border-0">
+                                <i class="bi bi-cart-x display-1 text-muted opacity-25 d-block mb-3"></i>
+                                <h4 class="fw-bold text-dark">Your cart is empty</h4>
+                                <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+                                <a href="/api/user/shops" class="btn btn-primary fw-bold px-4 rounded-pill">
+                                    Browse Pet Shops
+                                </a>
+                            </div>
+                            <% } else { %>
+                                <!-- Populated Cart -->
+                                <div class="row g-4">
+
+                                    <!-- Left Column: Cart Items -->
+                                    <div class="col-lg-8">
+                                        <div class="bg-white rounded-4 shadow-sm p-4 border-0 mb-4">
+
+                                            <!-- Active Shop Header -->
+                                            <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                                <div class="bg-primary-subtle text-primary rounded-circle p-2 me-3">
+                                                    <i class="bi bi-shop fs-4"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted small mb-0">Ordering from:</p>
+                                                    <h5 class="fw-bold mb-0">
+                                                        <%= cart.activeShop.shopName %>
+                                                    </h5>
+                                                </div>
+                                            </div>
+
+                                            <!-- Cart Items Loop -->
+                                            <% let subtotal=0; %>
+                                                <% cart.items.forEach(item=> { %>
+                                                    <% // Calculate math for this specific item const
+                                                        itemTotal=item.product.price * item.quantity; subtotal
+                                                        +=itemTotal; %>
+
+                                                        <div class="d-flex align-items-center py-3 border-bottom">
+                                                            <!-- Product Image -->
+                                                            <% if (item.product.images && item.product.images.length> 0)
+                                                                { %>
+                                                                <img src="<%= item.product.images[0] %>"
+                                                                    alt="<%= item.product.name %>"
+                                                                    class="cart-item-img border">
+                                                                <% } else { %>
+                                                                    <div
+                                                                        class="cart-item-img bg-light border d-flex align-items-center justify-content-center text-muted">
+                                                                        <i class="bi bi-box"></i>
+                                                                    </div>
+                                                                    <% } %>
+
+                                                                        <!-- Product Details -->
+                                                                        <div class="ms-3 flex-grow-1">
+                                                                            <h6 class="fw-bold text-dark mb-1">
+                                                                                <%= item.product.name %>
+                                                                            </h6>
+                                                                            <div class="text-success fw-bold">₹<%=
+                                                                                    item.product.price %>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Quantity Controls -->
+                                                                        <div
+                                                                            class="d-flex flex-column align-items-end ms-3">
+                                                                            <div
+                                                                                class="d-flex align-items-center border rounded-pill p-1">
+
+                                                                                <!-- Decrease Quantity Form -->
+                                                                                <form action="/api/user/cart/update"
+                                                                                    method="POST" class="m-0">
+                                                                                    <input type="hidden"
+                                                                                        name="productId"
+                                                                                        value="<%= item.product._id %>">
+                                                                                    <input type="hidden" name="action"
+                                                                                        value="decrease">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-light rounded-circle qty-btn text-dark border-0">
+                                                                                        <i class="bi bi-dash"></i>
+                                                                                    </button>
+                                                                                </form>
+
+                                                                                <span class="fw-bold px-3">
+                                                                                    <%= item.quantity %>
+                                                                                </span>
+
+                                                                                <!-- Increase Quantity Form -->
+                                                                                <form action="/api/user/cart/update"
+                                                                                    method="POST" class="m-0">
+                                                                                    <input type="hidden"
+                                                                                        name="productId"
+                                                                                        value="<%= item.product._id %>">
+                                                                                    <input type="hidden" name="action"
+                                                                                        value="increase">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-light rounded-circle qty-btn text-dark border-0">
+                                                                                        <i class="bi bi-plus"></i>
+                                                                                    </button>
+                                                                                </form>
+                                                                            </div>
+
+                                                                            <!-- Remove Item completely -->
+                                                                            <form action="/api/user/cart/remove"
+                                                                                method="POST" class="mt-2">
+                                                                                <input type="hidden" name="productId"
+                                                                                    value="<%= item.product._id %>">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-link text-danger text-decoration-none p-0 small fw-medium">Remove</button>
+                                                                            </form>
+                                                                        </div>
+                                                        </div>
+                                                        <% }) %>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- Right Column: Order Summary (Sticky) -->
+                                    <div class="col-lg-4">
+                                        <div class="bg-white rounded-4 shadow-sm p-4 border-0 position-sticky"
+                                            style="top: 20px;">
+                                            <h5 class="fw-bold border-bottom pb-3 mb-3">Order Summary</h5>
+
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="text-muted">Subtotal</span>
+                                                <span class="fw-medium">₹<%= subtotal %></span>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                                                <span class="text-muted">Platform Fee</span>
+                                                <span class="fw-medium">₹20</span>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <span class="fs-5 fw-bold text-dark">Total</span>
+                                                <span class="fs-5 fw-bold text-success">₹<%= subtotal + 20 %></span>
+                                            </div>
+
+                                            <a href="/api/user/checkout"
+                                                class="btn btn-primary w-100 fw-bold py-2 rounded-pill shadow-sm">
+                                                Proceed to Checkout
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <% } %>
+
+                </main>
+            </div>
+
+            <%- include('./partials/footer') %>

@@ -3,6 +3,11 @@ const User = require("../models/userModel");
 const Appointment = require("../models/appointmentModel");
 const DoctorSchedule = require("../models/doctorScheduleModel");
 const Doctor = require("../models/doctorModel");
+const Shop = require("../models/shopModel");
+const Category = require("../models/categoryModel");
+const Product = require("../models/productModel");
+const Cart = require("../models/cartModel");
+
 const mongoose = require("mongoose");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs/promises");
@@ -287,24 +292,24 @@ class PetController {
       const userId = new mongoose.Types.ObjectId(req.user.id);
 
       const appointments = await Appointment.aggregate([
-        // 1. MATCH: Find only appointments belonging to the logged-in pet owner
+        // Find only appointments belonging to the logged-in pet owner
         {
           $match: { owner: userId },
         },
 
-        // 2. LOOKUP: Join the Pet collection to get the pet's name/details
+      // Join the Pet collection to get the pet's name/details
         {
           $lookup: {
-            from: "pets", // Mongoose pluralizes model names by default
+            from: "pets",
             localField: "pet",
             foreignField: "_id",
             as: "petDetails",
           },
         },
-        // $unwind flattens the array into a single object
+        
         { $unwind: "$petDetails" },
 
-        // 3. LOOKUP: Join the Doctor collection to get specialization & clinic address
+        //  Join the Doctor collection to get specialization & clinic address
         {
           $lookup: {
             from: "doctors",
@@ -315,8 +320,8 @@ class PetController {
         },
         { $unwind: "$doctorProfile" },
 
-        // 4. NESTED LOOKUP: Join the User collection to get the Doctor's actual Name
-        // (Because the Doctor model only stores a reference to the User model)
+        //  Join the User collection to get the Doctor's actual Name
+        
         {
           $lookup: {
             from: "users",
@@ -327,7 +332,7 @@ class PetController {
         },
         { $unwind: "$doctorUser" },
 
-        // 5. LOOKUP: Join the DoctorSchedule to get shift timings (startTime, endTime)
+        //Join the DoctorSchedule to get shift timings (startTime, endTime)
         {
           $lookup: {
             from: "doctorschedules", // Default plural of DoctorSchedule
@@ -338,12 +343,12 @@ class PetController {
         },
         { $unwind: "$scheduleDetails" },
 
-        // 6. SORT: Order by upcoming dates first
+        //Order by upcoming dates first
         {
           $sort: { appointmentDate: 1 },
         },
 
-        // 7. PROJECT: Clean up the output so we only send necessary data to EJS
+        // Clean up the output so we only send necessary data to EJS
         {
           $project: {
             _id: 1,
@@ -362,7 +367,7 @@ class PetController {
         },
       ]);
 
-      // Send the cleanly aggregated data to the EJS template
+      
       res.render("petOwner/appointments", {
         user: req.user,
         appointments: appointments,
@@ -413,18 +418,18 @@ class PetController {
 
   async bookAppointment(req, res) {
     try {
-      const userId = req.user.id; // The logged-in Pet Owner
+      const userId = req.user.id; 
 
-      // Data coming from the frontend form in "Book Doctor"
+      
       const { doctorId, scheduleId, petId, reason } = req.body;
 
-      // 1. Basic Validation
+      
       if (!doctorId || !scheduleId || !petId || !reason) {
         req.flash("error", "All fields are required to book an appointment.");
-        return res.redirect("back"); // Sends them back to the booking form
+        return res.redirect("back"); 
       }
 
-      // 2. Fetch the Schedule and Doctor details
+     
       const schedule = await DoctorSchedule.findById(scheduleId);
       const doctor = await Doctor.findById(doctorId);
 
@@ -433,7 +438,7 @@ class PetController {
         return res.redirect("/api/pet/view/book-doctor");
       }
 
-      // 3. CRITICAL: Check if the shift is already full
+    
       if (schedule.bookedCount >= schedule.maxPatients) {
         req.flash(
           "error",
@@ -442,26 +447,25 @@ class PetController {
         return res.redirect("/api/pet/view/book-doctor");
       }
 
-      // 4. ATOMIC UPDATE: Increment bookedCount and get the Token Number
-      // We use $inc to prevent "Race Conditions" (two users clicking book at the exact same millisecond)
+      
       const updatedSchedule = await DoctorSchedule.findByIdAndUpdate(
         scheduleId,
         { $inc: { bookedCount: 1 } },
-        { new: true }, // Returns the updated document
+        { new: true }, 
       );
 
       const generatedTokenNumber = updatedSchedule.bookedCount;
 
-      // 5. Create the Appointment Document!
+      
       const newAppointment = new Appointment({
         owner: userId,
         pet: petId,
         doctor: doctorId,
         schedule: scheduleId,
-        tokenNumber: generatedTokenNumber, // Assign the token number!
+        tokenNumber: generatedTokenNumber, 
         appointmentDate: schedule.date,
         reason: reason,
-        consultationFee: doctor.consultationFee, // Pulled dynamically from the Doctor's profile
+        consultationFee: doctor.consultationFee, 
         status: "Confirmed",
       });
 
@@ -472,12 +476,12 @@ class PetController {
         `Appointment Confirmed! You are Token #${generatedTokenNumber}`,
       );
 
-      // Redirect them to the "Appointments" sidebar option so they can see their ticket
+     
       return res.redirect("/api/pet/view/book-doctor");
     } catch (error) {
       console.error("Booking Error:", error);
 
-      // Check for the compound unique index error we added earlier (booking same pet twice in one shift)
+      
       if (error.code === 11000) {
         req.flash(
           "error",
@@ -491,6 +495,183 @@ class PetController {
       }
 
       return res.redirect("back");
+    }
+  }
+
+  async petShop(req, res) {
+    try {
+      const loggedUser = req.user;
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = 9;
+      const skip = (page - 1) * limit;
+      const searchQuery = req.query.search || "";
+
+      const query = { isActive: true };
+
+      if (searchQuery) {
+        query.shopName = { $regex: searchQuery, $options: "i" };
+      }
+
+      const totalShops = await Shop.countDocuments(query);
+      const totalPages = Math.ceil(totalShops / limit);
+
+      const availablePetshop = await Shop.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      res.render("petOwner/pet-shop", {
+        user: loggedUser,
+        shops: availablePetshop,
+        searchQuery: searchQuery,
+        currentPage: page,
+        totalPages: totalPages,
+      });
+    } catch (error) {
+      console.error("Pet Shop Directory Error: ", error.message);
+      req.flash(
+        "error",
+        "Something went wrong. Please try again after some time.",
+      );
+      return res.redirect("/api/pet/dashboard");
+    }
+  }
+
+  async products(req, res) {
+    try {
+      const loggedUser = req.user;
+      const shopId = req.params.id;
+      const selectedCategoryId = req.query.category;
+
+      const shopDetails = await Shop.findById(shopId);
+
+      if (!shopDetails) {
+        req.flash("error", "Shop not found or is no longer active.");
+        return res.redirect("/api/user/shops");
+      }
+      const categories = await Category.find({ shop: shopId, isActive: true });
+
+      const productQuery = { shop: shopId, isActive: true };
+
+      // If the user clicked a specific category, filter the products!
+      if (selectedCategoryId) {
+        productQuery.category = selectedCategoryId;
+      }
+
+      const products = await Product.find(productQuery)
+        .populate("shop", "shopName logo")
+        .populate("category", "name")
+        .sort({ createdAt: -1 });
+
+      res.render("petOwner/products", {
+        user: loggedUser,
+        products: products,
+        shop: shopDetails,
+        categories: categories,
+        selectedCategoryId: selectedCategoryId,
+      });
+    } catch (error) {
+      console.error("View Shop Products Error: ", error);
+      req.flash("error", "Something went wrong while loading the shop.");
+      return res.redirect("/api/user/shops");
+    }
+  }
+
+  // 1. Attempt to add item to cart
+  async addToCart(req, res) {
+    try {
+      const userId = req.user.id;
+      const { productId, shopId } = req.body;
+
+      
+      let cart = await Cart.findOne({ user: userId });
+      if (!cart) {
+        cart = new Cart({ user: userId, items: [], activeShop: null });
+      }
+
+      
+      if (
+        cart.activeShop &&
+        cart.activeShop.toString() !== shopId &&
+        cart.items.length > 0
+      ) {
+       
+        return res.status(409).json({
+          conflict: true,
+          message:
+            "Your cart contains items from a different shop. Do you want to clear your cart and add this item instead?",
+        });
+      }
+
+ 
+      cart.activeShop = shopId; 
+
+      
+      const existingItemIndex = cart.items.findIndex(
+        (item) => item.product.toString() === productId,
+      );
+      if (existingItemIndex > -1) {
+        cart.items[existingItemIndex].quantity += 1;
+      } else {
+        cart.items.push({ product: productId, quantity: 1 });
+      }
+
+      await cart.save();
+      return res
+        .status(200)
+        .json({ success: true, message: "Item added to cart!" });
+    } catch (error) {
+      console.error("Cart Add Error:", error);
+      return res.status(500).json({ success: false, message: "Server error" });
+    }
+  }
+
+  // Forcefully replace the cart (User clicked "Yes" on modal)
+  async replaceCart(req, res) {
+    try {
+      const userId = req.user.id;
+      const { productId, shopId } = req.body;
+
+      let cart = await Cart.findOne({ user: userId });
+
+      // Overwrite the old cart data entirely
+      cart.activeShop = shopId;
+      cart.items = [{ product: productId, quantity: 1 }];
+
+      await cart.save();
+      return res
+        .status(200)
+        .json({ success: true, message: "Cart replaced and item added!" });
+    } catch (error) {
+      console.error("Cart Replace Error:", error);
+      return res.status(500).json({ success: false, message: "Server error" });
+    }
+  }
+  // View Cart Page
+  async viewCart(req, res) {
+    try {
+      const userId = req.user.id;
+      const loggedUser = req.user;
+
+     
+      const cart = await Cart.findOne({ user: userId })
+        .populate("activeShop", "shopName logo")
+        .populate({
+          path: "items.product",
+          select: "name price images stock" 
+        });
+
+      // Render the EJS template and pass the data
+      res.render("petOwner/cart", {
+        user: loggedUser,
+        cart: cart // EJS will handle it gracefully if cart is null
+      });
+
+    } catch (error) {
+      console.error("View Cart Error:", error);
+      req.flash("error", "Something went wrong while loading your cart.");
+      res.redirect("/api/pet/view/shop");
     }
   }
 }

@@ -1,0 +1,285 @@
+<%- include('./partials/header') %>
+    <%- include('./partials/sidebar') %>
+        <%- include('./partials/navbar') %>
+
+            <style>
+                /* Shop Header Styling */
+                .storefront-banner {
+                    height: 250px;
+                    object-fit: cover;
+                    width: 100%;
+                    border-radius: 1rem;
+                }
+
+                .storefront-logo {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    border: 5px solid #fff;
+                    margin-top: -60px;
+                    position: relative;
+                    z-index: 2;
+                    background: #fff;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
+                    object-fit: cover;
+                }
+
+                /* Product Card Hover */
+                .product-card {
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                }
+
+                .product-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+                }
+
+                /* Sticky Category Nav */
+                .sticky-categories {
+                    position: sticky;
+                    top: 0;
+                    z-index: 1020;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(10px);
+                }
+            </style>
+
+            <!-- Remember: We are using d-flex and NO .row wrapper to keep the sidebar intact! -->
+            <div class="d-flex bg-light min-vh-100">
+
+                <!-- Include User Sidebar -->
+
+
+                <!-- Main Content Area -->
+                <main class="flex-grow-1 px-md-4 py-4 mb-5" style="width: 0; overflow-x: hidden;">
+
+                    <!-- Back Button & Flash Messages -->
+                    <div class="mb-3">
+                        <a href="/api/pet/view/shop" class="text-decoration-none text-muted fw-bold">
+                            <i class="bi bi-arrow-left me-1"></i> Back to Shops
+                        </a>
+                    </div>
+                    <%- include('./partials/flash') %>
+
+                        <!-- Shop Header Profile -->
+                        <div class="bg-white rounded-4 shadow-sm mb-4 pb-4 text-center position-relative border-0">
+                            <% if (shop.logo) { %>
+                                <img src="<%= shop.logo %>" alt="<%= shop.shopName %> Banner" class="storefront-banner">
+                                <% } else { %>
+                                    <div
+                                        class="storefront-banner bg-secondary-subtle d-flex justify-content-center align-items-center">
+                                        <i class="bi bi-shop text-secondary opacity-50 display-1"></i>
+                                    </div>
+                                    <% } %>
+
+                                        <img src="<%= shop.logo || 'https://ui-avatars.com/api/?name=' + shop.shopName + '&background=0D8ABC&color=fff' %>"
+                                            alt="<%= shop.shopName %> Logo" class="storefront-logo mx-auto">
+
+                                        <h1 class="h2 fw-bold text-dark mt-2 mb-1">
+                                            <%= shop.shopName %>
+                                        </h1>
+                                        <p class="text-muted mb-3">
+                                            <%= shop.description || 'Welcome to our digital storefront!' %>
+                                        </p>
+
+
+                        </div>
+
+                        <!-- Sticky Categories Bar (Optional feature for later) -->
+                        <div
+                            class="sticky-categories border-bottom pb-2 pt-3 mb-4 d-flex gap-3 overflow-x-auto shadow-sm px-3 rounded-3">
+                            <a href="/api/pet/view/products/<%= shop._id %>"
+                                class="text-decoration-none fw-bold <%= !selectedCategoryId ? 'text-primary border-bottom border-primary border-3' : 'text-muted' %> pb-2"
+                                style="white-space: nowrap;">
+                                All Products
+                            </a>
+                            <% if (typeof categories !=='undefined' && categories.length> 0) { %>
+                                <% categories.forEach(category=> { %>
+
+                                    <!-- If the category ID matches the URL query, highlight it -->
+                                    <a href="/api/pet/view/products/<%= shop._id %>?category=<%= category._id %>"
+                                        class="text-decoration-none fw-bold <%= selectedCategoryId === category._id.toString() ? 'text-primary border-bottom border-primary border-3' : 'text-muted' %> pb-2"
+                                        style="white-space: nowrap;">
+                                        <%= category.name %>
+                                    </a>
+
+                                    <% }) %>
+                                        <% } %>
+                        </div>
+
+                        <!-- Products Grid -->
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                            <% if (typeof products !=='undefined' && products.length> 0) { %>
+                                <% products.forEach(product=> { %>
+                                    <div class="col">
+                                        <div
+                                            class="card h-100 border-0 shadow-sm product-card rounded-4 overflow-hidden">
+
+                                            <!-- Product Image -->
+                                            <div class="position-relative bg-white text-center p-3"
+                                                style="height: 200px;">
+                                                <% if (product.images && product.images.length> 0) { %>
+                                                    <img src="<%= product.images[0] %>" alt="<%= product.name %>"
+                                                        class="img-fluid h-100 object-fit-contain">
+                                                    <% } else { %>
+                                                        <i
+                                                            class="bi bi-box-seam display-1 text-muted opacity-25 d-flex h-100 align-items-center justify-content-center"></i>
+                                                        <% } %>
+
+                                                            <!-- Discount Badge -->
+                                                            <% if (product.discountPercentage> 0) { %>
+                                                                <span
+                                                                    class="position-absolute top-0 start-0 m-3 badge bg-danger">
+                                                                    <%= product.discountPercentage %>% OFF
+                                                                </span>
+                                                                <% } %>
+                                            </div>
+
+                                            <div class="card-body bg-light border-top d-flex flex-column">
+                                                <!-- Category -->
+                                                <small class="text-muted text-uppercase fw-bold mb-1"
+                                                    style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                                    <%= product.category ? product.category.name : 'General' %>
+                                                </small>
+
+                                                <!-- Title -->
+                                                <h5 class="card-title fw-bold text-dark mb-2 text-truncate"
+                                                    title="<%= product.name %>">
+                                                    <%= product.name %>
+                                                </h5>
+
+                                                <!-- Pricing -->
+                                                <div
+                                                    class="mt-auto d-flex align-items-end justify-content-between mb-3">
+                                                    <div>
+                                                        <span class="fs-5 fw-bold text-success">₹<%= product.price %>
+                                                        </span>
+                                                        <% if (product.mrp> product.price) { %>
+                                                            <small
+                                                                class="text-muted text-decoration-line-through ms-1">₹
+                                                                <%= product.mrp %>
+                                                            </small>
+                                                            <% } %>
+                                                    </div>
+                                                    <small class="text-muted">
+                                                        <%= product.stock> 0 ? 'In Stock' : 'Out of Stock' %>
+                                                    </small>
+                                                </div>
+
+                                                <!-- Add to Cart Form -->
+                                                <!-- AJAX Add to Cart Button -->
+                                                <button type="button"
+                                                    onclick="addToCart('<%= product._id %>', '<%= shop._id %>')"
+                                                    class="btn w-100 fw-bold mt-auto <%= product.stock > 0 ? 'btn-primary' : 'btn-secondary disabled' %>">
+                                                    <% if (product.stock> 0) { %>
+                                                        <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                                                        <% } else { %>
+                                                            Out of Stock
+                                                            <% } %>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <!-- Empty State -->
+                                            <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border-0">
+                                                <i
+                                                    class="bi bi-box2-heart display-1 text-muted opacity-25 d-block mb-3"></i>
+                                                <h4 class="fw-bold text-dark">No Products Available</h4>
+                                                <p class="text-muted">This shop hasn't listed any items yet. Check back
+                                                    soon!</p>
+                                            </div>
+                                            <% } %>
+                        </div>
+
+                </main>
+            </div>
+            <!-- Replace Cart Confirmation Modal -->
+            <div class="modal fade" id="replaceCartModal" tabindex="-1" aria-labelledby="replaceCartModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header bg-danger text-white border-0">
+                            <h5 class="modal-title fw-bold" id="replaceCartModalLabel"><i
+                                    class="bi bi-exclamation-triangle-fill me-2"></i>Replace Cart?</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body py-4">
+                            <p class="mb-0 text-dark">Your cart currently contains items from a different pet shop. Do
+                                you
+                                want to clear your current cart and start a new order from this shop?</p>
+                        </div>
+                        <div class="modal-footer bg-light border-0">
+                            <button type="button" class="btn btn-secondary fw-bold"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <!-- The confirm button will be injected with the product/shop ID dynamically -->
+                            <button type="button" class="btn btn-danger fw-bold" id="confirmReplaceBtn">Yes, Clear &
+                                Replace</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Initialize Bootstrap Modal
+                const replaceCartModal = new bootstrap.Modal(document.getElementById('replaceCartModal'));
+                const confirmReplaceBtn = document.getElementById('confirmReplaceBtn');
+
+                // 1. The Main Add to Cart Function
+                async function addToCart(productId, shopId) {
+                    try {
+                        const response = await fetch('/api/pet/cart/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId, shopId })
+                        });
+
+                        const data = await response.json();
+
+                        // CONFLICT DETECTED: Show the modal!
+                        if (response.status === 409) {
+                            // Attach the IDs to the confirm button so it knows what to replace
+                            confirmReplaceBtn.onclick = () => replaceCart(productId, shopId);
+                            replaceCartModal.show();
+                        }
+                        // SUCCESS
+                        else if (response.ok) {
+                            // Optional: Show a little toast notification or update a cart badge here
+                            alert(data.message); // Replace with a nice UI toast later!
+                        }
+                        // ERROR
+                        else {
+                            alert(data.message || 'Error adding to cart.');
+                        }
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                        alert('Something went wrong checking your cart.');
+                    }
+                }
+
+                // 2. The Override Function (When they click 'Yes' in the modal)
+                async function replaceCart(productId, shopId) {
+                    try {
+                        const response = await fetch('/api/pet/cart/replace', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId, shopId })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            replaceCartModal.hide();
+                            alert('Cart replaced successfully!'); // Replace with toast later
+                        } else {
+                            alert(data.message || 'Failed to replace cart.');
+                        }
+                    } catch (error) {
+                        console.error('Fetch error:', error);
+                        alert('Something went wrong replacing your cart.');
+                    }
+                }
+            </script>
+            <%- include('./partials/footer') %>
