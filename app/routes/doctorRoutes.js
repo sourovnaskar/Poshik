@@ -54,4 +54,12 @@ routes.post(
   doctrorController.cancelSchedule,
 );
 
+// Doctor's appointments management
+routes.get("/appointments", authCheck, doctrorController.renderAppointments);
+routes.post("/appointments/update/:id", authCheck, doctrorController.updateAppointmentStatus);
+
+// Doctor's earnings report
+routes.get("/earnings", authCheck, doctrorController.renderEarnings);
+routes.get("/patients", authCheck, doctrorController.mypatients);
+
 module.exports = routes;

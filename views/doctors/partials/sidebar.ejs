@@ -34,21 +34,21 @@
                 <% } %>
             </a>
 
-            <a href="<%= isApproved ? '/doctor/appointments' : '#' %>"
+            <a href="<%= isApproved ? '/api/doctor/appointments' : '#' %>"
               class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
               <span>Appointments</span>
               <% if (!isApproved) { %> <span>🔒</span>
                 <% } %>
             </a>
 
-            <a href="<%= isApproved ? '/doctor/patients' : '#' %>"
+            <a href="<%= isApproved ? '/api/doctor/patients' : '#' %>"
               class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
               <span>My Patients</span>
               <% if (!isApproved) { %> <span>🔒</span>
                 <% } %>
             </a>
 
-            <a href="<%= isApproved ? '/doctor/wallet' : '#' %>"
+            <a href="<%= isApproved ? '/api/doctor/earnings' : '#' %>"
               class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
               <span>Earnings</span>
               <% if (!isApproved) { %> <span>🔒</span>

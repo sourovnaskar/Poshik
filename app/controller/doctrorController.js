@@ -5,18 +5,90 @@ const cloudinary = require("../config/cloudinary");
 const fs = require("fs/promises");
 const User = require("../models/userModel");
 const doctorScheduleModel = require("../models/doctorScheduleModel");
+const Appointment = require("../models/appointmentModel");
 const { date } = require("joi");
 
 class DoctorController {
   async renderDashboard(req, res) {
-    const loggedUser = req.user;
-    const userId = loggedUser.id;
-    const doctorProfile = await Doctor.findOne({ user: userId });
-    const hasProfile = doctorProfile ? true : false;
-    res.render("doctors/dashboard", {
-      user: loggedUser,
-      hasProfile: hasProfile,
-    });
+    try {
+      const loggedUser = req.user;
+      const userId = loggedUser.id;
+
+      const doctorProfile = await Doctor.findOne({ user: userId });
+      const hasProfile = doctorProfile ? true : false;
+
+      let todaysAppointmentsCount = 0;
+      let pendingAppointmentsCount = 0;
+      let weeklyEarnings = 0;
+      let recentAppointments = [];
+
+      if (hasProfile) {
+        const Appointment = require("../models/appointmentModel");
+
+        // Today's Date boundaries
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+
+        // Calculate Today's Appointments
+        todaysAppointmentsCount = await Appointment.countDocuments({
+          doctor: doctorProfile._id,
+          appointmentDate: { $gte: startOfToday, $lte: endOfToday },
+        });
+
+        // Calculate Pending Appointments
+        pendingAppointmentsCount = await Appointment.countDocuments({
+          doctor: doctorProfile._id,
+          status: "Pending",
+        });
+
+        // Calculate Weekly Earnings (from Completed appointments in the last 7 days)
+        const startOfWeek = new Date();
+        startOfWeek.setDate(startOfWeek.getDate() - 7);
+
+        const weeklyAppointments = await Appointment.find({
+          doctor: doctorProfile._id,
+          status: "Completed",
+          updatedAt: { $gte: startOfWeek },
+        });
+
+        weeklyEarnings = weeklyAppointments.reduce(
+          (sum, appt) => sum + (appt.consultationFee || 0),
+          0,
+        );
+
+        // Fetch Recent/Upcoming Appointments for the dashboard table
+        recentAppointments = await Appointment.find({
+          doctor: doctorProfile._id,
+        })
+          .populate("owner", "name")
+          .populate("pet", "name species")
+          .populate("schedule", "date startTime endTime")
+          .sort({ appointmentDate: 1 })
+          .limit(5); // Show only the next 5
+      }
+
+      res.render("doctors/dashboard", {
+        user: loggedUser,
+        hasProfile: hasProfile,
+        todaysAppointmentsCount,
+        pendingAppointmentsCount,
+        weeklyEarnings,
+        recentAppointments,
+      });
+    } catch (error) {
+      console.error(error);
+      req.flash("error", "Error loading dashboard data");
+      res.render("doctors/dashboard", {
+        user: req.user,
+        hasProfile: false,
+        todaysAppointmentsCount: 0,
+        pendingAppointmentsCount: 0,
+        weeklyEarnings: 0,
+        recentAppointments: [],
+      });
+    }
   }
 
   async renderKycForm(req, res) {
@@ -378,6 +450,170 @@ class DoctorController {
         "An error occurred while Cancel your Schedule. Please try again.",
       );
       return res.redirect("/api/doctor/appointment/schedule");
+    }
+  }
+
+  // Fetch and display doctor's appointments
+  async renderAppointments(req, res) {
+    try {
+      const loggedUser = req.user;
+      const userId = loggedUser.id;
+
+      const doctorProfile = await Doctor.findOne({ user: userId });
+
+      if (!doctorProfile) {
+        req.flash("error", "Doctor profile not found.");
+        return res.redirect("/api/doctor/profile/form");
+      }
+
+      // Fetch appointments and populate related data
+      const appointments = await Appointment.find({ doctor: doctorProfile._id })
+        .populate("owner", "name email")
+        .populate("pet", "name species breed age")
+        .populate("schedule", "date startTime endTime");
+
+      res.render("doctors/appointments", {
+        user: loggedUser,
+        appointments: appointments,
+      });
+    } catch (error) {
+      console.error("Error fetching appointments:", error.message);
+      req.flash("error", "Could not load appointments.");
+      return res.redirect("/api/doctor/dashboard");
+    }
+  }
+
+  // Update the status of an appointment
+  async updateAppointmentStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const loggedUser = req.user;
+      const userId = loggedUser.id;
+
+      const doctorProfile = await Doctor.findOne({ user: userId });
+      if (!doctorProfile) {
+        req.flash("error", "Unauthorized access.");
+        return res.redirect("/api/doctor/dashboard");
+      }
+
+      const appointment = await Appointment.findOne({
+        _id: id,
+        doctor: doctorProfile._id,
+      });
+      if (!appointment) {
+        req.flash("error", "Appointment not found.");
+        return res.redirect("/api/doctor/appointments");
+      }
+
+      // Update and save status
+      appointment.status = status;
+      await appointment.save();
+
+      req.flash(
+        "success",
+        `Appointment status successfully updated to ${status}.`,
+      );
+      return res.redirect("/api/doctor/appointments");
+    } catch (error) {
+      console.error("Error updating appointment status:", error.message);
+      req.flash("error", "Could not update appointment status.");
+      return res.redirect("/api/doctor/appointments");
+    }
+  }
+
+  // Fetch and calculate earnings for the doctor
+  async renderEarnings(req, res) {
+    try {
+      const loggedUser = req.user;
+      const userId = loggedUser.id;
+
+      const doctorProfile = await Doctor.findOne({ user: userId });
+
+      if (!doctorProfile) {
+        req.flash("error", "Doctor profile not found.");
+        return res.redirect("/api/doctor/profile/form");
+      }
+
+      // Fetch all Completed Appointments for this doctor
+      const completedAppointments = await Appointment.find({
+        doctor: doctorProfile._id,
+        status: "Completed",
+      })
+        .populate("owner", "name")
+        .populate("pet", "name image")
+        .sort({ updatedAt: -1 });
+
+      // Initialize counters
+      let totalEarnings = 0;
+      let monthlyEarnings = 0;
+      let weeklyEarnings = 0;
+
+      const now = new Date();
+
+      // First day of current month
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // First day of current week
+      const startOfWeek = new Date(now);
+      const day = startOfWeek.getDay();
+      const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+      startOfWeek.setDate(diff);
+      startOfWeek.setHours(0, 0, 0, 0);
+
+      completedAppointments.forEach((appt) => {
+        const fee = appt.consultationFee || 0;
+        totalEarnings += fee;
+
+        const updatedDate = new Date(appt.updatedAt || appt.appointmentDate);
+
+        if (updatedDate >= startOfMonth) {
+          monthlyEarnings += fee;
+        }
+
+        if (updatedDate >= startOfWeek) {
+          weeklyEarnings += fee;
+        }
+      });
+
+      res.render("doctors/earnings", {
+        user: loggedUser,
+        totalEarnings,
+        monthlyEarnings,
+        weeklyEarnings,
+        transactions: completedAppointments,
+      });
+    } catch (error) {
+      console.error("Error loading earnings:", error);
+      req.flash("error", "Error loading earnings data.");
+      return res.redirect("/api/doctor/dashboard");
+    }
+  }
+
+  async mypatients(req, res) {
+    try {
+      const loggedUser = req.user;
+      const userId = loggedUser.id;
+
+      const doctorProfile = await Doctor.findOne({ user: userId });
+
+      if (!doctorProfile) {
+        req.flash("error", "Doctor profile not found.");
+        return res.redirect("/api/doctor/profile/form");
+      }
+      const patients = await Appointment.find({
+        doctor: doctorProfile._id,
+      })
+        .populate("owner", " name")
+        .populate("pet", "-owner -vaccinationDetails -medicalHistory");
+      res.render("doctors/my-patients", {
+        user: loggedUser,
+        patients: patients,
+      });
+    } catch (error) {
+      console.error("Error loading My-patients:", error);
+      req.flash("error", "Error loading earnings data.");
+      return res.redirect("/api/doctor/dashboard");
     }
   }
 }

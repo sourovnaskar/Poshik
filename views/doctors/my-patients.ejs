@@ -1,0 +1,150 @@
+<%- include('./partials/header') %>
+    
+        <%- include('./partials/navbar') %>
+
+            <!-- 
+  Tailwind Dashboard Wrapper
+  The 'flex' class ensures the sidebar and main content sit side-by-side natively.
+-->
+            <div class="flex min-h-screen bg-gray-50">
+
+                <!-- Include Doctor Sidebar -->
+
+<%- include('./partials/sidebar') %>
+                <!-- 
+      Main Content Area 
+      If your sidebar in 'sidebar.ejs' uses 'fixed w-64', add 'md:ml-64' to this main tag to prevent overlap!
+    -->
+             <main class="flex-1 w-full flex flex-col p-4 md:p-8 lg:p-10 overflow-x-hidden md:ml-64">
+                    <!-- Header Section -->
+                    <div
+                        class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-gray-200 pb-5">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">My Patients</h1>
+                            <p class="text-sm text-gray-500 mt-1">A roster of pets you have treated or have appointments
+                                with.</p>
+                        </div>
+
+                        <!-- Export Button -->
+                        <button
+                            class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                            <svg class="-ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Export List
+                        </button>
+                    </div>
+
+                    <!-- Flash Messages -->
+                    <%- include('./partials/flash') %>
+
+                        <% if (!patients || patients.length===0) { %>
+                            <!-- Empty State -->
+                            <div
+                                class="flex flex-col items-center justify-center bg-white rounded-2xl shadow-sm border border-gray-100 py-16 px-4 text-center mt-2">
+                                <div class="bg-indigo-50 p-4 rounded-full mb-4">
+                                    <svg class="h-10 w-10 text-indigo-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-gray-900">No Patients Yet</h3>
+                                <p class="text-sm text-gray-500 mt-2 max-w-sm">You do not have any registered patients
+                                    or upcoming appointments at this time.</p>
+                            </div>
+                            <% } else { %>
+                                <!-- Patients Roster Table -->
+                                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden mt-2">
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50/80">
+                                                <tr>
+                                                    <th scope="col"
+                                                        class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                        Patient (Pet)</th>
+                                                    <th scope="col"
+                                                        class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                        Species / Breed</th>
+                                                    <th scope="col"
+                                                        class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                        Owner Name</th>
+                                                    <th scope="col"
+                                                        class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                                        Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-100">
+                                                <% patients.forEach(appointment=> { %>
+                                                    <% if (appointment.pet) { %>
+                                                        <tr
+                                                            class="hover:bg-gray-50/80 transition-colors duration-150 group">
+                                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                                <div class="flex items-center">
+                                                                    <!-- Dynamic Avatar based on Pet Name -->
+                                                                    <div
+                                                                        class="flex-shrink-0 h-11 w-11 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg shadow-sm">
+                                                                        <%= appointment.pet.name.charAt(0).toUpperCase()
+                                                                            %>
+                                                                    </div>
+                                                                    <div class="ml-4">
+                                                                        <div class="text-sm font-bold text-gray-900">
+                                                                            <%= appointment.pet.name %>
+                                                                        </div>
+                                                                        <div class="text-xs text-gray-500 mt-0.5">Age:
+                                                                            <%= appointment.pet.age ?
+                                                                                appointment.pet.age : 'N/A' %>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                                <div class="text-sm text-gray-900 font-medium">
+                                                                    <%= appointment.pet.species || 'Unknown' %>
+                                                                </div>
+                                                                <div class="text-xs text-gray-500 mt-0.5">
+                                                                    <%= appointment.pet.breed || 'Mixed' %>
+                                                                </div>
+                                                            </td>
+                                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                                <div
+                                                                    class="flex items-center text-sm text-gray-700 font-medium">
+                                                                    <svg class="h-5 w-5 text-gray-400 mr-2" fill="none"
+                                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
+                                                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                                                        </path>
+                                                                    </svg>
+                                                                    <%= appointment.owner ? appointment.owner.name
+                                                                        : 'Unknown Owner' %>
+                                                                </div>
+                                                            </td>
+                                                            <td
+                                                                class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                                <a href="/api/doctor/patients/<%= appointment.pet._id %>"
+                                                                    class="inline-flex items-center px-3 py-1.5 border border-indigo-200 rounded-lg text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-300 transition-colors font-semibold shadow-sm">
+                                                                    View Profile
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
+                                                            <% }) %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Summary Footer -->
+                                <div class="mt-4 text-sm text-gray-500 font-medium text-right pe-2">
+                                    Showing <%= patients.length %> appointment records.
+                                </div>
+                                <% } %>
+
+                </main>
+            </div>
+
+            <%- include('./partials/footer') %>
