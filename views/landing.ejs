@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <meta name="description" content="Poshik is India's all-in-one pet care platform. Book veterinarians, shop premium pet products, and manage your pet's health — all in one place." />
+  <meta name="keywords" content="pet care, veterinarian booking, pet shop, pet health, Poshik, India" />
+  <meta property="og:title" content="Poshik — Care for Your Pet, Made Simple" />
+  <meta property="og:description" content="Book vets, shop pet products, manage your pet's health — Poshik has it all." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind + Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Fraunces', 'serif'],
+          },
+          colors: {
+            brand: { 50:'#ecfdf5', 100:'#d1fae5', 200:'#a7f3d0', 300:'#6ee7b7', 400:'#34d399', 500:'#10b981', 600:'#059669', 700:'#047857', 800:'#065f46', 900:'#064e3b' },
+            warm: { 50:'#fffbeb', 100:'#fef3c7', 200:'#fde68a', 300:'#fcd34d', 400:'#fbbf24', 500:'#f59e0b', 600:'#d97706' },
+            rose: { 50:'#fff1f2', 100:'#ffe4e6', 500:'#f43f5e', 600:'#e11d48' },
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'float-delay': 'float 6s ease-in-out 2s infinite',
+            'slide-up': 'slideUp 0.8s ease-out forwards',
+            'fade-in': 'fadeIn 1s ease-out forwards',
+            'pulse-slow': 'pulse 3s ease-in-out infinite',
+            'bounce-slow': 'bounce 2.5s infinite',
+          },
+          keyframes: {
+            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-18px)' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(40px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+          },
+          backgroundImage: {
+            'hero-gradient': 'linear-gradient(135deg, #064e3b 0%, #065f46 30%, #047857 60%, #059669 100%)',
+            'card-gradient': 'linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6))',
+          },
+          boxShadow: {
+            'glow': '0 0 40px rgba(16, 185, 129, 0.3)',
+            'glow-warm': '0 0 40px rgba(251, 191, 36, 0.3)',
+            'xl2': '0 25px 60px rgba(0,0,0,0.12)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-display { font-family: 'Fraunces', serif; }
+
+    /* Glassmorphism */
+    .glass {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .glass-white {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Animated gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #10b981, #34d399, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Mesh gradient background */
+    .mesh-bg {
+      background: radial-gradient(ellipse at 20% 50%, rgba(16,185,129,0.15) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 20%, rgba(251,191,36,0.10) 0%, transparent 40%),
+                  radial-gradient(ellipse at 50% 80%, rgba(6,95,70,0.12) 0%, transparent 50%),
+                  #f8fffe;
+    }
+
+    /* Blob shapes */
+    .blob {
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      animation: blob-morph 8s ease-in-out infinite;
+    }
+    @keyframes blob-morph {
+      0%,100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+      50% { border-radius: 40% 60% 60% 40% / 30% 70% 30% 70%; }
+      75% { border-radius: 70% 30% 40% 60% / 60% 30% 70% 40%; }
+    }
+
+    /* Feature card hover */
+    .feature-card {
+      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), box-shadow 0.35s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+    }
+
+    /* Stat counter pop */
+    .stat-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 50px rgba(16,185,129,0.2);
+    }
+
+    /* Scroll reveal via intersection observer */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-left.visible { opacity: 1; transform: none; }
+    .reveal-right { opacity: 0; transform: translateX(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal-right.visible { opacity: 1; transform: none; }
+
+    /* Navbar scroll effect */
+    .navbar-scrolled {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 10px; }
+
+    /* Mobile menu transition */
+    #mobile-menu { transition: max-height 0.4s ease, opacity 0.3s ease; overflow: hidden; max-height: 0; opacity: 0; }
+    #mobile-menu.open { max-height: 500px; opacity: 1; }
+
+    /* Hero image float */
+    .hero-img-wrap { animation: float 6s ease-in-out infinite; }
+    .badge-float { animation: float 6s ease-in-out 1s infinite; }
+    .badge-float2 { animation: float 6s ease-in-out 3s infinite; }
+
+    /* Process step connector */
+    .step-connector { position: relative; }
+    .step-connector::after {
+      content: '';
+      position: absolute;
+      top: 28px;
+      right: -50%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #10b981, #d1fae5);
+      display: none;
+    }
+    @media (min-width: 768px) {
+      .step-connector::after { display: block; }
+    }
+    .step-connector:last-child::after { display: none !important; }
+
+    /* CTA gradient button */
+    .btn-primary-cta {
+      background: linear-gradient(135deg, #059669, #10b981);
+      box-shadow: 0 8px 30px rgba(16,185,129,0.4);
+      transition: all 0.3s ease;
+    }
+    .btn-primary-cta:hover {
+      background: linear-gradient(135deg, #047857, #059669);
+      box-shadow: 0 12px 40px rgba(16,185,129,0.6);
+      transform: translateY(-2px);
+    }
+    .btn-secondary-cta {
+      border: 2px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+    .btn-secondary-cta:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.7);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+
+<body class="mesh-bg text-slate-800 antialiased overflow-x-hidden">
+
+  <!-- ======== NAVBAR ======== -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4 px-4 sm:px-6 lg:px-0">
+    <div class="max-w-7xl mx-auto px-0 sm:px-6">
+      <div class="flex items-center justify-between">
+
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg shadow-brand-500/40">
+            <i class="fas fa-paw text-white text-lg"></i>
+          </div>
+          <span class="text-2xl font-black text-slate-900 tracking-tight font-display">Poshik</span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#features" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Features</a>
+          <a href="#how-it-works" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">How It Works</a>
+          <a href="#roles" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">For Everyone</a>
+          <a href="#testimonials" class="text-sm font-semibold text-slate-600 hover:text-brand-600 transition-colors">Reviews</a>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="hidden md:flex items-center gap-3">
+          <a href="/api/auth/login" class="px-5 py-2.5 text-sm font-semibold text-slate-700 hover:text-brand-600 transition-colors">Log In</a>
+          <a href="/api/auth/register" class="px-6 py-2.5 text-sm font-bold text-white rounded-xl btn-primary-cta">
+            Get Started Free
+          </a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="menuBtn" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none" aria-label="Open menu">
+          <i id="menuIcon" class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="md:hidden">
+        <div class="pt-4 pb-2 flex flex-col gap-1">
+          <a href="#features" class="px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-sm">Features</a>
+          <a href="#how-it-works" class="px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-sm">How It Works</a>
+          <a href="#roles" class="px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-sm">For Everyone</a>
+          <a href="#testimonials" class="px-4 py-3 rounded-xl font-semibold text-slate-700 hover:bg-brand-50 hover:text-brand-700 transition-colors text-sm">Reviews</a>
+          <div class="flex gap-3 mt-3 pt-3 border-t border-slate-200">
+            <a href="/api/auth/login" class="flex-1 py-3 text-center text-sm font-bold text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors">Log In</a>
+            <a href="/api/auth/register" class="flex-1 py-3 text-center text-sm font-bold text-white rounded-xl btn-primary-cta">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======== HERO SECTION ======== -->
+  <section class="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-hero-gradient">
+    <!-- Background decoration blobs -->
+    <div class="absolute -top-40 -right-40 w-96 h-96 bg-brand-400/20 blob"></div>
+    <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-warm-300/20 blob" style="animation-delay: 2s;"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-brand-700/20 blur-3xl pointer-events-none"></div>
+
+    <!-- Floating decorative dots grid -->
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 36px 36px;"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+        <!-- Left: Text Content -->
+        <div class="text-center lg:text-left">
+          <!-- Pill badge -->
+          <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-8">
+            <span class="w-2 h-2 rounded-full bg-brand-300 animate-pulse"></span>
+            <span class="text-brand-200 text-xs font-semibold tracking-wide uppercase">India's #1 Pet Care Platform</span>
+          </div>
+
+          <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-6">
+            Care for Your <br>
+            <span class="text-warm-300 relative inline-block">
+              Pet
+              <svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 9C50 3 150 3 198 9" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+              </svg>
+            </span>, <br>Made Simple
+          </h1>
+
+          <p class="text-brand-100 text-lg sm:text-xl leading-relaxed mb-10 max-w-xl mx-auto lg:mx-0">
+            Book certified veterinarians, shop premium pet products, track health records, and manage your furry family — all from one powerful platform.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+            <a href="/api/auth/register" id="hero-cta" class="w-full sm:w-auto px-8 py-4 font-bold text-slate-900 bg-warm-300 hover:bg-warm-400 rounded-2xl text-base shadow-glow-warm transition-all duration-300 hover:-translate-y-1 flex items-center justify-center gap-2">
+              <i class="fas fa-paw"></i>
+              Start for Free
+              <i class="fas fa-arrow-right text-sm"></i>
+            </a>
+            <a href="#how-it-works" class="w-full sm:w-auto px-8 py-4 font-bold text-white btn-secondary-cta rounded-2xl text-base flex items-center justify-center gap-2">
+              <i class="fas fa-play-circle"></i>
+              See How It Works
+            </a>
+          </div>
+
+          <!-- Social proof / trust bar -->
+          <div class="mt-12 flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start">
+            <div class="flex -space-x-3">
+              <img src="https://i.pravatar.cc/40?img=11" alt="user" class="w-10 h-10 rounded-full border-2 border-brand-700 object-cover">
+              <img src="https://i.pravatar.cc/40?img=22" alt="user" class="w-10 h-10 rounded-full border-2 border-brand-700 object-cover">
+              <img src="https://i.pravatar.cc/40?img=33" alt="user" class="w-10 h-10 rounded-full border-2 border-brand-700 object-cover">
+              <img src="https://i.pravatar.cc/40?img=44" alt="user" class="w-10 h-10 rounded-full border-2 border-brand-700 object-cover">
+              <div class="w-10 h-10 rounded-full border-2 border-brand-700 bg-brand-500 flex items-center justify-center text-white text-xs font-bold">2K+</div>
+            </div>
+            <div>
+              <div class="flex items-center gap-1 text-warm-300 mb-0.5">
+                <i class="fas fa-star text-sm"></i><i class="fas fa-star text-sm"></i><i class="fas fa-star text-sm"></i><i class="fas fa-star text-sm"></i><i class="fas fa-star text-sm"></i>
+              </div>
+              <p class="text-brand-200 text-sm font-medium">Trusted by 2,000+ happy pet owners</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Hero Image Composition -->
+        <div class="relative flex justify-center lg:justify-end">
+          <!-- Main image -->
+          <div class="hero-img-wrap relative">
+            <div class="w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white/20">
+              <img src="https://images.unsplash.com/photo-1601758003122-53c40e686a19?w=600&auto=format&fit=crop&q=80" 
+                   alt="Happy dog with owner" class="w-full h-full object-cover">
+            </div>
+            
+            <!-- Floating card 1: Appointment Booked -->
+            <div class="badge-float absolute -top-6 -left-6 sm:-left-12 glass-white rounded-2xl px-4 py-3 shadow-xl2 flex items-center gap-3 min-w-max">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center text-brand-600 text-lg">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 font-medium">Just booked!</p>
+                <p class="text-sm font-bold text-slate-800">Dr. Priya — 3:00 PM</p>
+              </div>
+            </div>
+
+            <!-- Floating card 2: Order on the way -->
+            <div class="badge-float2 absolute -bottom-4 -right-4 sm:-right-10 glass-white rounded-2xl px-4 py-3 shadow-xl2 flex items-center gap-3 min-w-max">
+              <div class="w-10 h-10 rounded-xl bg-warm-100 flex items-center justify-center text-warm-600 text-lg">
+                <i class="fas fa-truck"></i>
+              </div>
+              <div>
+                <p class="text-xs text-slate-500 font-medium">Royal Canin Order</p>
+                <p class="text-sm font-bold text-slate-800">Out for Delivery 🎉</p>
+              </div>
+            </div>
+
+            <!-- Floating card 3: small paw badge -->
+            <div class="absolute top-1/2 -right-6 sm:-right-10 -translate-y-1/2 w-16 h-16 bg-brand-500 rounded-2xl shadow-xl flex items-center justify-center animate-bounce-slow">
+              <i class="fas fa-paw text-white text-2xl"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stats Row -->
+      <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <% const stats = [
+          { value: '2,000+', label: 'Pet Owners', icon: 'fa-users', color: 'bg-brand-500/10 text-brand-300' },
+          { value: '150+', label: 'Verified Vets', icon: 'fa-user-md', color: 'bg-warm-400/10 text-warm-300' },
+          { value: '500+', label: 'Pet Products', icon: 'fa-box-open', color: 'bg-rose-500/10 text-rose-300' },
+          { value: '5,000+', label: 'Appointments', icon: 'fa-calendar-check', color: 'bg-indigo-400/10 text-indigo-300' },
+        ]; %>
+        <% stats.forEach(s => { %>
+          <div class="stat-card glass rounded-2xl p-5 text-center">
+            <div class="w-12 h-12 rounded-xl <%= s.color %> bg-white/10 flex items-center justify-center text-2xl mx-auto mb-3">
+              <i class="fas <%= s.icon %>"></i>
+            </div>
+            <p class="text-3xl font-black text-white mb-1"><%= s.value %></p>
+            <p class="text-brand-200 text-sm font-medium"><%= s.label %></p>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- Wave divider -->
+    <div class="absolute bottom-0 left-0 right-0">
+      <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0 80L60 69.3C120 58.7 240 37.3 360 32C480 26.7 600 37.3 720 42.7C840 48 960 48 1080 42.7C1200 37.3 1320 26.7 1380 21.3L1440 16V80H0Z" fill="#f8fffe"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ======== FEATURES SECTION ======== -->
+  <section id="features" class="py-20 lg:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <span class="inline-block text-brand-600 font-bold text-sm uppercase tracking-widest bg-brand-50 px-4 py-1.5 rounded-full mb-4">Everything you need</span>
+      <h2 class="font-display text-4xl sm:text-5xl font-black text-slate-900 mb-5 leading-tight">
+        A Complete Pet Care <br><span class="gradient-text">Ecosystem</span>
+      </h2>
+      <p class="text-slate-500 text-lg max-w-2xl mx-auto leading-relaxed">
+        From booking a vet appointment to ordering premium food — Poshik brings every pet care need under one roof.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
+
+      <%
+      const features = [
+        { icon: 'fa-calendar-alt', emoji: '🩺', color: 'from-emerald-400 to-teal-500', bg: 'bg-emerald-50', border: 'border-emerald-100', title: 'Book Vet Appointments', desc: 'Find certified veterinarians nearby, view their schedules in real time, and book appointments with instant confirmation — no calls needed.' },
+        { icon: 'fa-shopping-bag', emoji: '🛍️', color: 'from-amber-400 to-orange-500', bg: 'bg-amber-50', border: 'border-amber-100', title: 'Premium Pet Shop', desc: 'Browse hundreds of curated products — premium food, toys, accessories, medicines — all from verified pet shops across India.' },
+        { icon: 'fa-paw', emoji: '🐾', color: 'from-violet-400 to-purple-500', bg: 'bg-violet-50', border: 'border-violet-100', title: 'Pet Profile Manager', desc: 'Create and manage detailed profiles for each of your pets — track breed, age, vaccinations, medical history and more.' },
+        { icon: 'fa-id-card', emoji: '✅', color: 'from-blue-400 to-indigo-500', bg: 'bg-blue-50', border: 'border-blue-100', title: 'KYC Verified Professionals', desc: 'Every doctor and shop owner undergoes a strict KYC verification process, so you only interact with trusted, verified professionals.' },
+        { icon: 'fa-chart-line', emoji: '📊', color: 'from-rose-400 to-pink-500', bg: 'bg-rose-50', border: 'border-rose-100', title: 'Doctor & Shop Dashboards', desc: 'Vets and shop owners get powerful dashboards to manage schedules, appointments, inventory, and grow their business on Poshik.' },
+        { icon: 'fa-shield-alt', emoji: '🛡️', color: 'from-slate-500 to-slate-700', bg: 'bg-slate-50', border: 'border-slate-100', title: 'Safe & Secure Platform', desc: 'JWT authentication, role-based access control, and encrypted data ensure your account and your pet\'s data remain protected always.' },
+      ];
+      %>
+
+      <% features.forEach((f, i) => { %>
+        <div class="feature-card glass-white rounded-3xl p-7 border <%= f.border %> group cursor-default reveal" style="transition-delay: <%= i * 80 %>ms;">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br <%= f.color %> flex items-center justify-center text-white text-2xl mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+            <i class="fas <%= f.icon %>"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800 mb-3"><%= f.title %></h3>
+          <p class="text-slate-500 text-sm leading-relaxed"><%= f.desc %></p>
+          <div class="mt-6 flex items-center gap-2 text-brand-600 font-semibold text-sm group-hover:gap-4 transition-all duration-300">
+            <span>Learn more</span>
+            <i class="fas fa-arrow-right text-xs"></i>
+          </div>
+        </div>
+      <% }) %>
+
+    </div>
+  </section>
+
+  <!-- ======== HOW IT WORKS SECTION ======== -->
+  <section id="how-it-works" class="py-20 lg:py-28 bg-gradient-to-br from-slate-900 via-brand-900 to-slate-900 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 30px 30px;"></div>
+    <div class="absolute top-20 right-20 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-10 left-10 w-48 h-48 bg-warm-400/10 rounded-full blur-3xl"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-block text-brand-300 font-bold text-sm uppercase tracking-widest bg-white/5 px-4 py-1.5 rounded-full mb-4 border border-white/10">Simple Process</span>
+        <h2 class="font-display text-4xl sm:text-5xl font-black text-white mb-5 leading-tight">
+          Up and running in <br><span class="text-warm-300">3 simple steps</span>
+        </h2>
+        <p class="text-slate-400 text-lg max-w-xl mx-auto leading-relaxed">Getting started with Poshik takes less than 2 minutes.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8 relative">
+        <%
+        const steps = [
+          { num: '01', icon: 'fa-user-plus', title: 'Create Your Account', desc: 'Sign up as a Pet Owner, Veterinarian, or Pet Shop. Verify your email and you\'re in — it\'s completely free.' },
+          { num: '02', icon: 'fa-paw', title: 'Add Your Pet', desc: 'Create a beautiful profile for your furry companion with their breed, age, and health history. Each pet gets their own space.' },
+          { num: '03', icon: 'fa-rocket', title: 'Book, Shop & Connect', desc: 'Find and book certified vets, shop premium products from local pet stores, and track everything from your dashboard.' },
+        ];
+        %>
+        <% steps.forEach((step, i) => { %>
+          <div class="step-connector reveal flex flex-col items-center text-center md:text-left md:items-start" style="transition-delay: <%= i * 120 %>ms;">
+            <!-- Step number -->
+            <div class="relative mb-6">
+              <div class="w-16 h-16 rounded-2xl bg-brand-500 flex items-center justify-center shadow-glow text-white text-2xl relative z-10">
+                <i class="fas <%= step.icon %>"></i>
+              </div>
+              <span class="absolute -top-3 -right-3 text-5xl font-black text-white/5 leading-none"><%= step.num %></span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3"><%= step.title %></h3>
+            <p class="text-slate-400 text-sm leading-relaxed"><%= step.desc %></p>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- CTA -->
+      <div class="text-center mt-14 reveal">
+        <a href="/api/auth/register" class="inline-flex items-center gap-3 px-10 py-4 font-black text-slate-900 bg-warm-300 hover:bg-warm-400 rounded-2xl text-lg shadow-glow-warm transition-all duration-300 hover:-translate-y-1">
+          <i class="fas fa-paw"></i>
+          Create Your Free Account
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== FOR EVERYONE (ROLES) SECTION ======== -->
+  <section id="roles" class="py-20 lg:py-28 px-4 sm:px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <span class="inline-block text-brand-600 font-bold text-sm uppercase tracking-widest bg-brand-50 px-4 py-1.5 rounded-full mb-4">Who is it for?</span>
+      <h2 class="font-display text-4xl sm:text-5xl font-black text-slate-900 mb-5 leading-tight">
+        Built for <span class="gradient-text">Everyone</span> in <br>the Pet World
+      </h2>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+
+      <!-- Pet Owner -->
+      <div class="rounded-3xl overflow-hidden shadow-xl2 group hover:-translate-y-2 transition-all duration-500 reveal" style="transition-delay: 0ms;">
+        <div class="h-52 relative overflow-hidden bg-gradient-to-br from-emerald-400 to-teal-600 flex items-end p-6">
+          <div class="absolute top-6 right-6 w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl">🐶</div>
+          <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 24px 24px;"></div>
+          <span class="relative z-10 text-xs font-bold uppercase tracking-widest text-emerald-100 bg-white/10 px-3 py-1 rounded-full">Pet Owner</span>
+        </div>
+        <div class="bg-white p-7">
+          <h3 class="text-2xl font-black text-slate-800 mb-3 font-display">For Pet Lovers</h3>
+          <p class="text-slate-500 text-sm leading-relaxed mb-5">Manage all your pets in one place, book vets, shop premium products, and never miss a vaccination.</p>
+          <ul class="space-y-2.5 mb-7">
+            <% ['Add & manage multiple pets', 'Book vet appointments online', 'Shop from verified pet stores', 'View medical & appointment history'].forEach(item => { %>
+              <li class="flex items-center gap-3 text-sm text-slate-600">
+                <div class="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                  <i class="fas fa-check text-brand-600 text-xs"></i>
+                </div>
+                <%= item %>
+              </li>
+            <% }) %>
+          </ul>
+          <a href="/api/auth/register" class="block w-full py-3 text-center font-bold text-white rounded-xl btn-primary-cta text-sm">
+            Join as Pet Owner
+          </a>
+        </div>
+      </div>
+
+      <!-- Veterinarian -->
+      <div class="rounded-3xl overflow-hidden shadow-xl2 group hover:-translate-y-2 transition-all duration-500 reveal lg:-translate-y-4 lg:shadow-glow" style="transition-delay: 80ms;">
+        <div class="h-52 relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-700 flex items-end p-6">
+          <div class="absolute top-6 right-6 w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl">🩺</div>
+          <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 24px 24px;"></div>
+          <div class="flex items-center gap-2 relative z-10">
+            <span class="text-xs font-bold uppercase tracking-widest text-blue-100 bg-white/10 px-3 py-1 rounded-full">Veterinarian</span>
+            <span class="text-xs font-bold text-yellow-300 bg-yellow-400/20 px-3 py-1 rounded-full">Most Popular</span>
+          </div>
+        </div>
+        <div class="bg-white p-7 border-t-4 border-brand-500">
+          <h3 class="text-2xl font-black text-slate-800 mb-3 font-display">For Doctors</h3>
+          <p class="text-slate-500 text-sm leading-relaxed mb-5">Get discovered by pet owners near you, manage your schedule effortlessly, and grow your practice online.</p>
+          <ul class="space-y-2.5 mb-7">
+            <% ['Professional public profile', 'Manage schedules & slots', 'Receive appointment bookings', 'Get KYC verified & build trust'].forEach(item => { %>
+              <li class="flex items-center gap-3 text-sm text-slate-600">
+                <div class="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                  <i class="fas fa-check text-brand-600 text-xs"></i>
+                </div>
+                <%= item %>
+              </li>
+            <% }) %>
+          </ul>
+          <a href="/api/auth/register" class="block w-full py-3 text-center font-bold text-white rounded-xl btn-primary-cta text-sm">
+            Join as Veterinarian
+          </a>
+        </div>
+      </div>
+
+      <!-- Pet Shop -->
+      <div class="rounded-3xl overflow-hidden shadow-xl2 group hover:-translate-y-2 transition-all duration-500 reveal" style="transition-delay: 160ms;">
+        <div class="h-52 relative overflow-hidden bg-gradient-to-br from-amber-400 to-orange-600 flex items-end p-6">
+          <div class="absolute top-6 right-6 w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl">🏪</div>
+          <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 24px 24px;"></div>
+          <span class="relative z-10 text-xs font-bold uppercase tracking-widest text-orange-100 bg-white/10 px-3 py-1 rounded-full">Pet Shop</span>
+        </div>
+        <div class="bg-white p-7">
+          <h3 class="text-2xl font-black text-slate-800 mb-3 font-display">For Shop Owners</h3>
+          <p class="text-slate-500 text-sm leading-relaxed mb-5">Bring your pet store online, manage your product catalog, and reach thousands of pet lovers across India.</p>
+          <ul class="space-y-2.5 mb-7">
+            <% ['List & manage your shop', 'Add products & categories', 'Reach 2,000+ pet owners', 'Track orders & payments'].forEach(item => { %>
+              <li class="flex items-center gap-3 text-sm text-slate-600">
+                <div class="w-5 h-5 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+                  <i class="fas fa-check text-brand-600 text-xs"></i>
+                </div>
+                <%= item %>
+              </li>
+            <% }) %>
+          </ul>
+          <a href="/api/auth/register" class="block w-full py-3 text-center font-bold text-white rounded-xl btn-primary-cta text-sm">
+            List Your Shop
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======== TESTIMONIALS SECTION ======== -->
+  <section id="testimonials" class="py-20 lg:py-28 px-4 sm:px-6 bg-slate-50 overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 reveal">
+        <span class="inline-block text-brand-600 font-bold text-sm uppercase tracking-widest bg-brand-50 px-4 py-1.5 rounded-full mb-4">Social Proof</span>
+        <h2 class="font-display text-4xl sm:text-5xl font-black text-slate-900 mb-5 leading-tight">
+          Loved by Pet <span class="gradient-text">Families</span>
+        </h2>
+        <p class="text-slate-500 text-lg max-w-xl mx-auto">Real stories from real pet lovers who use Poshik every day.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-7">
+        <%
+        const testimonials = [
+          { name: 'Priya Sharma', role: 'Dog Mom, Mumbai', avatar: 'https://i.pravatar.cc/80?img=5', rating: 5, text: 'Booking a vet for my golden retriever used to be so stressful. With Poshik, I found Dr. Mehta in minutes and got a same-day appointment. Absolutely love it!', accent: 'bg-brand-50 border-brand-100' },
+          { name: 'Arjun Reddy', role: 'Veterinarian, Bengaluru', avatar: 'https://i.pravatar.cc/80?img=12', rating: 5, text: 'As a vet, Poshik has completely transformed how I manage appointments. My schedule is always full now and the KYC verification gave my patients more confidence in me.', accent: 'bg-blue-50 border-blue-100' },
+          { name: 'Sneha Patel', role: 'Cat Parent, Ahmedabad', avatar: 'https://i.pravatar.cc/80?img=9', rating: 5, text: 'I ordered cat food and toys through Poshik\'s pet shop and received them next day. The product quality is amazing. My kitty approves! 🐱', accent: 'bg-amber-50 border-amber-100' },
+          { name: 'Rajan Joshi', role: 'Pet Shop Owner, Pune', avatar: 'https://i.pravatar.cc/80?img=15', rating: 5, text: 'My shop\'s online presence has grown 3x since joining Poshik. The dashboard makes managing products and orders incredibly easy. Best decision I made.', accent: 'bg-rose-50 border-rose-100' },
+          { name: 'Meera Krishnan', role: 'Dog Mom, Chennai', avatar: 'https://i.pravatar.cc/80?img=7', rating: 5, text: 'Managing health records for 2 dogs was chaos before Poshik. Now everything is organized — vaccination dates, vet visits, everything in one place. Incredible!', accent: 'bg-violet-50 border-violet-100' },
+          { name: 'Vikram Singh', role: 'Veterinarian, Delhi', avatar: 'https://i.pravatar.cc/80?img=21', rating: 5, text: 'The platform is so well-built. My profile is professional, payments are transparent, and I spend less time on admin work, more time with my patients. Highly recommend.', accent: 'bg-teal-50 border-teal-100' },
+        ];
+        %>
+        <% testimonials.forEach((t, i) => { %>
+          <div class="feature-card bg-white rounded-3xl p-7 border <%= t.accent %> reveal" style="transition-delay: <%= i * 60 %>ms;">
+            <!-- Stars -->
+            <div class="flex items-center gap-1 mb-4">
+              <% for(let s = 0; s < t.rating; s++) { %>
+                <i class="fas fa-star text-warm-400 text-sm"></i>
+              <% } %>
+            </div>
+            <!-- Quote -->
+            <p class="text-slate-600 text-sm leading-relaxed mb-6 italic">"<%= t.text %>"</p>
+            <!-- Author -->
+            <div class="flex items-center gap-3">
+              <img src="<%= t.avatar %>" alt="<%= t.name %>" class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-md">
+              <div>
+                <p class="font-bold text-slate-800 text-sm"><%= t.name %></p>
+                <p class="text-slate-500 text-xs"><%= t.role %></p>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== CTA BANNER SECTION ======== -->
+  <section class="py-20 lg:py-28 px-4 sm:px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="relative rounded-[2.5rem] overflow-hidden bg-hero-gradient p-12 md:p-20 text-center reveal">
+        <!-- Decorations -->
+        <div class="absolute top-0 left-0 w-full h-full opacity-10" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 30px 30px;"></div>
+        <div class="absolute -top-20 -right-20 w-64 h-64 bg-warm-400/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-brand-300/20 rounded-full blur-3xl"></div>
+
+        <div class="relative z-10">
+          <span class="text-5xl mb-6 block">🐾</span>
+          <h2 class="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+            Your Pet Deserves <br>the <span class="text-warm-300">Very Best</span>
+          </h2>
+          <p class="text-brand-100 text-lg sm:text-xl mb-10 max-w-xl mx-auto leading-relaxed">
+            Join thousands of pet owners who trust Poshik for their pet's health, happiness, and care. Sign up free today.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="/api/auth/register" class="w-full sm:w-auto px-10 py-4 font-black text-slate-900 bg-warm-300 hover:bg-warm-400 rounded-2xl text-lg shadow-glow-warm transition-all duration-300 hover:-translate-y-1">
+              Create Free Account <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+            <a href="/api/auth/login" class="w-full sm:w-auto px-10 py-4 font-bold text-white btn-secondary-cta rounded-2xl text-base">
+              Already have an account? Log In
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== FOOTER ======== -->
+  <footer class="bg-slate-900 text-slate-400 pt-16 pb-8 px-4 sm:px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-slate-800">
+
+        <!-- Brand column -->
+        <div class="lg:col-span-2">
+          <a href="/" class="flex items-center gap-3 mb-5">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-lg">
+              <i class="fas fa-paw text-white text-lg"></i>
+            </div>
+            <span class="text-2xl font-black text-white font-display">Poshik</span>
+          </a>
+          <p class="text-sm leading-relaxed text-slate-500 mb-6 max-w-xs">
+            India's all-in-one pet care platform. We connect pet owners with trusted veterinarians and premium pet shops for a healthier, happier furry family.
+          </p>
+          <div class="flex items-center gap-4">
+            <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-brand-600 flex items-center justify-center transition-colors duration-300">
+              <i class="fab fa-instagram text-slate-400 hover:text-white text-sm"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-blue-600 flex items-center justify-center transition-colors duration-300">
+              <i class="fab fa-twitter text-slate-400 hover:text-white text-sm"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-indigo-600 flex items-center justify-center transition-colors duration-300">
+              <i class="fab fa-linkedin-in text-slate-400 hover:text-white text-sm"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-white font-bold mb-5 text-sm uppercase tracking-wider">Platform</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="#features" class="hover:text-brand-400 transition-colors">Features</a></li>
+            <li><a href="#how-it-works" class="hover:text-brand-400 transition-colors">How It Works</a></li>
+            <li><a href="#roles" class="hover:text-brand-400 transition-colors">For Pet Owners</a></li>
+            <li><a href="#roles" class="hover:text-brand-400 transition-colors">For Veterinarians</a></li>
+            <li><a href="#roles" class="hover:text-brand-400 transition-colors">For Pet Shops</a></li>
+          </ul>
+        </div>
+
+        <!-- Account Links -->
+        <div>
+          <h4 class="text-white font-bold mb-5 text-sm uppercase tracking-wider">Account</h4>
+          <ul class="space-y-3 text-sm">
+            <li><a href="/api/auth/register" class="hover:text-brand-400 transition-colors">Create Account</a></li>
+            <li><a href="/api/auth/login" class="hover:text-brand-400 transition-colors">Login</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition-colors">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition-colors">Terms of Service</a></li>
+            <li><a href="mailto:support@poshik.in" class="hover:text-brand-400 transition-colors">Contact Support</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Footer bottom -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+        <p>© 2026 Poshik. Built with ❤️ for every pet family in India.</p>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
+          <span>All systems operational</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======== JAVASCRIPT ======== -->
+  <script>
+    // --- Navbar scroll effect ---
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 30) {
+        navbar.classList.add('navbar-scrolled');
+        navbar.classList.remove('py-4');
+        navbar.classList.add('py-2');
+      } else {
+        navbar.classList.remove('navbar-scrolled');
+        navbar.classList.add('py-4');
+        navbar.classList.remove('py-2');
+      }
+    });
+
+    // --- Mobile menu toggle ---
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menuIcon');
+    menuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.contains('open');
+      mobileMenu.classList.toggle('open');
+      menuIcon.className = isOpen ? 'fas fa-bars text-xl' : 'fas fa-times text-xl';
+    });
+
+    // Close mobile menu when link clicked
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        menuIcon.className = 'fas fa-bars text-xl';
+      });
+    });
+
+    // --- Scroll reveal animation ---
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+      revealObserver.observe(el);
+    });
+
+    // --- Smooth scroll for anchor links ---
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // --- Animated counters ---
+    function animateCounter(el, target, suffix = '') {
+      let count = 0;
+      const duration = 2000;
+      const step = target / (duration / 16);
+      const timer = setInterval(() => {
+        count = Math.min(count + step, target);
+        el.textContent = Math.floor(count).toLocaleString() + suffix;
+        if (count >= target) clearInterval(timer);
+      }, 16);
+    }
+  </script>
+</body>
+</html>

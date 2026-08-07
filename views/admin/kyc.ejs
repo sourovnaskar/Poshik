@@ -1,0 +1,100 @@
+<%- include('partials/header') %>
+
+<div class="glass-card rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+  <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">KYC Applications</h2>
+      <p class="text-sm text-slate-500 mt-1">Review and approve or reject KYC documents.</p>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm whitespace-nowrap">
+      <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+        <tr>
+          <th class="px-6 py-4">Applicant</th>
+          <th class="px-6 py-4">Role</th>
+          <th class="px-6 py-4">ID Type</th>
+          <th class="px-6 py-4">Documents</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% if(kycs && kycs.length > 0) { %>
+          <% kycs.forEach(kyc => { %>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <img src="<%= kyc.user.profileImage || 'https://ui-avatars.com/api/?name='+kyc.user.name %>" alt="" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                  <div>
+                    <p class="font-semibold text-slate-800"><%= kyc.user.name %></p>
+                    <span class="text-xs text-slate-500"><%= kyc.user.email %></span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md text-xs font-medium"><%= kyc.user.role %></span>
+              </td>
+              <td class="px-6 py-4 text-slate-600 font-medium">
+                <%= kyc.idType %>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <a href="<%= kyc.idProof %>" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs transition-colors flex items-center gap-1">
+                    <i class="fas fa-file-image text-slate-500"></i> ID
+                  </a>
+                  <a href="<%= kyc.addressProof %>" target="_blank" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs transition-colors flex items-center gap-1">
+                    <i class="fas fa-file-contract text-slate-500"></i> Address
+                  </a>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <% if(kyc.status === 'Pending') { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending
+                  </span>
+                <% } else if(kyc.status === 'Approved') { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Approved
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Rejected
+                  </span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <% if(kyc.status === 'Pending') { %>
+                  <div class="flex justify-end gap-2">
+                    <form action="/admin/kyc/<%= kyc._id %>/approve" method="POST">
+                      <button type="submit" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 rounded-lg text-xs font-medium transition-colors border border-emerald-200">
+                        Approve
+                      </button>
+                    </form>
+                    <form action="/admin/kyc/<%= kyc._id %>/reject" method="POST">
+                      <button type="submit" class="px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 rounded-lg text-xs font-medium transition-colors border border-rose-200">
+                        Reject
+                      </button>
+                    </form>
+                  </div>
+                <% } else { %>
+                  <span class="text-xs text-slate-400">Action taken</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+              <i class="fas fa-clipboard-check text-4xl mb-3 text-slate-300"></i>
+              <p>No KYC applications found</p>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

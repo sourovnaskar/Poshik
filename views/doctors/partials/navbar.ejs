@@ -29,7 +29,7 @@
       <!-- User Profile & Dropdown -->
       <div class="relative group">
         <button class="flex items-center gap-2 focus:outline-none p-1 rounded-lg hover:bg-gray-50 transition">
-          <img src="<%= user.profileImage %>" alt="Profile" class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover border-2 border-teal-500">
+          <img src="<%= typeof user !== 'undefined' && user && user.image ? user.image : '/images/default-avatar.png' %>" alt="Profile" class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover border-2 border-teal-500">
           <span class="hidden md:block text-sm font-medium text-gray-700">Dr. <%= user.name.split(' ')[0] %></span>
           <svg class="w-4 h-4 text-gray-500 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>

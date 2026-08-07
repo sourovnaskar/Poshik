@@ -1,0 +1,84 @@
+<%- include('partials/header') %>
+
+<div class="glass-card rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+  <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Manage Doctors</h2>
+      <p class="text-sm text-slate-500 mt-1">View and manage all registered veterinarians.</p>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm whitespace-nowrap">
+      <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+        <tr>
+          <th class="px-6 py-4">Doctor</th>
+          <th class="px-6 py-4">Specialization</th>
+          <th class="px-6 py-4">Experience</th>
+          <th class="px-6 py-4">Fee</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% if(doctors && doctors.length > 0) { %>
+          <% doctors.forEach(doc => { %>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <img src="<%= doc.user.profileImage || 'https://ui-avatars.com/api/?name='+doc.user.name+'&background=random' %>" alt="" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                  <div>
+                    <p class="font-semibold text-slate-800"><%= doc.user.name %></p>
+                    <span class="text-xs text-slate-500"><%= doc.user.email %></span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium"><%= doc.specialization %></span>
+              </td>
+              <td class="px-6 py-4 text-slate-600">
+                <%= doc.experience %> Years
+              </td>
+              <td class="px-6 py-4 font-semibold text-slate-700">
+                ₹<%= doc.consultationFee %>
+              </td>
+              <td class="px-6 py-4">
+                <% if(doc.isActive) { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Inactive
+                  </span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <form action="/admin/doctors/<%= doc._id %>/toggle-status" method="POST" class="inline-block">
+                  <% if(doc.isActive) { %>
+                    <button type="submit" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Deactivate">
+                      <i class="fas fa-ban"></i>
+                    </button>
+                  <% } else { %>
+                    <button type="submit" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Activate">
+                      <i class="fas fa-check-circle"></i>
+                    </button>
+                  <% } %>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+              <i class="fas fa-user-md text-4xl mb-3 text-slate-300"></i>
+              <p>No doctors found</p>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

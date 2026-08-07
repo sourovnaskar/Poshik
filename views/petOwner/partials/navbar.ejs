@@ -7,7 +7,9 @@
             </a>
 
             <!-- Mobile Toggle -->
-            <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse" data-bs-target="#petOwnerNavbar" aria-controls="petOwnerNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse"
+                data-bs-target="#petOwnerNavbar" aria-controls="petOwnerNavbar" aria-expanded="false"
+                aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -24,49 +26,71 @@
                             <i class="fa-solid fa-dog me-1 d-lg-none"></i> My Pets
                         </a>
                     </li>
-                    
+
                     <!-- Shopping Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle rounded-pill px-3" href="#" id="shoppingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle rounded-pill px-3" href="#" id="shoppingDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-bag-shopping me-1 d-lg-none"></i> Shop
                         </a>
                         <ul class="dropdown-menu border-0 shadow-sm rounded-4 mt-2" aria-labelledby="shoppingDropdown">
-                            <li><a class="dropdown-item py-2" href="/api/pet/view/shop"><i class="fa-solid fa-store me-2 text-muted"></i> Pet Shops</a></li>
-                            <li><a class="dropdown-item py-2" href="/owner/orders"><i class="fa-solid fa-box-open me-2 text-muted"></i> My Orders</a></li>
+                            <li><a class="dropdown-item py-2" href="/api/pet/view/shop"><i
+                                        class="fa-solid fa-store me-2 text-muted"></i> Pet Shops</a></li>
+                            <li><a class="dropdown-item py-2" href="/owner/orders"><i
+                                        class="fa-solid fa-box-open me-2 text-muted"></i> My Orders</a></li>
                         </ul>
                     </li>
 
                     <!-- Healthcare Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle rounded-pill px-3" href="#" id="healthcareDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle rounded-pill px-3" href="#" id="healthcareDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-user-doctor me-1 d-lg-none"></i> Healthcare
                         </a>
-                        <ul class="dropdown-menu border-0 shadow-sm rounded-4 mt-2" aria-labelledby="healthcareDropdown">
-                            <li><a class="dropdown-item py-2" href="/api/pet/view/book-doctor"><i class="fa-solid fa-stethoscope me-2 text-muted"></i> Book Doctor</a></li>
-                            <li><a class="dropdown-item py-2" href="/api/pet/appointements"><i class="fa-solid fa-calendar-check me-2 text-muted"></i> Appointments</a></li>
+                        <ul class="dropdown-menu border-0 shadow-sm rounded-4 mt-2"
+                            aria-labelledby="healthcareDropdown">
+                            <li><a class="dropdown-item py-2" href="/api/pet/view/book-doctor"><i
+                                        class="fa-solid fa-stethoscope me-2 text-muted"></i> Book Doctor</a></li>
+                            <li><a class="dropdown-item py-2" href="/api/pet/appointements"><i
+                                        class="fa-solid fa-calendar-check me-2 text-muted"></i> Appointments</a></li>
                         </ul>
                     </li>
                 </ul>
 
                 <!-- Right Side (Cart & Profile) -->
                 <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0 border-top border-lg-0 pt-3 pt-lg-0">
-                    <a href="/api/pet/cart" class="btn btn-light rounded-circle position-relative p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+                    <a href="/api/pet/cart"
+                        class="btn btn-light rounded-circle position-relative p-2 d-flex align-items-center justify-content-center shadow-sm"
+                        style="width: 40px; height: 40px;">
                         <i class="fa-solid fa-cart-shopping text-dark"></i>
                     </a>
-                    
+
                     <div class="dropdown">
-                        <a href="#" class="d-flex align-items-center text-dark text-decoration-none bg-light rounded-pill p-1 pe-3 shadow-sm border" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="<%= typeof user !== 'undefined' && user && user.image ? user.image : '/images/default-avatar.png' %>" alt="Profile" class="rounded-circle object-fit-cover me-2" style="width: 35px; height: 35px;">
-                            <span class="fw-bold fs-6 text-truncate" style="max-width: 120px;"><%= typeof user !== 'undefined' && user ? user.name.split(' ')[0] : 'Owner' %></span>
+                        <a href="#"
+                            class="d-flex align-items-center text-dark text-decoration-none bg-light rounded-pill p-1 pe-3 shadow-sm border"
+                            id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="<%= typeof user !== 'undefined' && user && user.image ? user.image : '/images/default-avatar.png' %>"
+                                alt="Profile" class="rounded-circle object-fit-cover me-2"
+                                style="width: 35px; height: 35px;">
+                            <span class="fw-bold fs-6 text-truncate" style="max-width: 120px;">
+                                <%= typeof user !=='undefined' && user ? user.name.split(' ')[0] : ' Owner' %>
+                            </span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2" aria-labelledby="dropdownUser">
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 mt-2"
+                            aria-labelledby="dropdownUser">
                             <li class="px-3 py-2 text-center">
-                                <span class="fw-bold d-block"><%= typeof user !== 'undefined' && user ? user.name : 'Pet Owner' %></span>
+                                <span class="fw-bold d-block">
+                                    <%= typeof user !=='undefined' && user ? user.name : 'Pet Owner' %>
+                                </span>
                                 <small class="text-muted">Manage your account</small>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2" href="/api/pet/owner/profile"><i class="fa-solid fa-user-gear me-2 text-muted"></i> Profile Settings</a></li>
-                            <li><a class="dropdown-item py-2 text-danger fw-medium" href="/api/auth/logout"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item py-2" href="/api/pet/owner/profile"><i
+                                        class="fa-solid fa-user-gear me-2 text-muted"></i> Profile Settings</a></li>
+                            <li><a class="dropdown-item py-2 text-danger fw-medium" href="/api/auth/logout"><i
+                                        class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
                         </ul>
                     </div>
                 </div>
@@ -74,8 +98,24 @@
         </div>
     </nav>
     <style>
-        .navbar-nav .nav-link { transition: all 0.2s ease-in-out; }
-        .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active { background-color: #e9ecef; color: #0d6efd !important; }
-        .dropdown-menu .dropdown-item { transition: background 0.2s; border-radius: 6px; margin: 0 4px; width: calc(100% - 8px); }
-        .dropdown-menu .dropdown-item:hover { background-color: #f8f9fa; }
+        .navbar-nav .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background-color: #e9ecef;
+            color: #0d6efd !important;
+        }
+
+        .dropdown-menu .dropdown-item {
+            transition: background 0.2s;
+            border-radius: 6px;
+            margin: 0 4px;
+            width: calc(100% - 8px);
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
     </style>

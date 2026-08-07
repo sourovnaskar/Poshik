@@ -58,7 +58,7 @@
 
   <div class="p-4 border-t">
     <div class="flex items-center gap-3">
-      <img src="<%= user.profileImage %>" alt="Profile" class="w-10 h-10 rounded-full object-cover">
+      <img src="<%= typeof user !== 'undefined' && user && user.image ? user.image : '/images/default-avatar.png' %>" alt="Profile" class="w-10 h-10 rounded-full object-cover">
       <div class="text-sm truncate">
         <p class="font-bold text-gray-800 truncate">
           <%= user.name %>

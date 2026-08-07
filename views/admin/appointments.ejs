@@ -1,0 +1,84 @@
+<%- include('partials/header') %>
+
+<div class="glass-card rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+  <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Monitor Appointments</h2>
+      <p class="text-sm text-slate-500 mt-1">View all booked appointments.</p>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm whitespace-nowrap">
+      <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+        <tr>
+          <th class="px-6 py-4">Date & Time</th>
+          <th class="px-6 py-4">Pet Owner</th>
+          <th class="px-6 py-4">Pet</th>
+          <th class="px-6 py-4">Doctor</th>
+          <th class="px-6 py-4">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% if(appointments && appointments.length > 0) { %>
+          <% appointments.forEach(app => { %>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <p class="font-medium text-slate-800"><%= new Date(app.appointmentDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) %></p>
+                <p class="text-xs text-slate-500 mt-0.5">Token: #<%= app.tokenNumber %></p>
+              </td>
+              <td class="px-6 py-4">
+                <% if(app.owner) { %>
+                  <div class="flex items-center gap-2">
+                    <img src="<%= app.owner.profileImage || 'https://ui-avatars.com/api/?name='+app.owner.name %>" alt="" class="w-8 h-8 rounded-full">
+                    <span class="font-medium text-slate-700"><%= app.owner.name %></span>
+                  </div>
+                <% } else { %>
+                  <span class="text-slate-400">N/A</span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4">
+                <% if(app.pet) { %>
+                  <span class="font-medium text-slate-700"><%= app.pet.name %></span>
+                <% } else { %>
+                  <span class="text-slate-400">N/A</span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4">
+                <% if(app.doctor && app.doctor.user) { %>
+                  <span class="font-medium text-slate-700">Dr. <%= app.doctor.user.name %></span>
+                <% } else { %>
+                  <span class="text-slate-400">N/A</span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4">
+                <% if(app.status === 'Confirmed') { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> <%= app.status %>
+                  </span>
+                <% } else if(app.status === 'Pending') { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> <%= app.status %>
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> <%= app.status %>
+                  </span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+              <i class="fas fa-calendar-times text-4xl mb-3 text-slate-300"></i>
+              <p>No appointments found</p>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

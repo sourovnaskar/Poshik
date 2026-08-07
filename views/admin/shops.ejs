@@ -1,0 +1,91 @@
+<%- include('partials/header') %>
+
+<div class="glass-card rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+  <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Manage Pet Shops</h2>
+      <p class="text-sm text-slate-500 mt-1">View and manage all registered pet shops.</p>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm whitespace-nowrap">
+      <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+        <tr>
+          <th class="px-6 py-4">Shop Name</th>
+          <th class="px-6 py-4">Owner</th>
+          <th class="px-6 py-4">Address & Contact</th>
+          <th class="px-6 py-4">Status</th>
+          <th class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% if(shops && shops.length > 0) { %>
+          <% shops.forEach(shop => { %>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg overflow-hidden">
+                    <% if(shop.logo) { %>
+                      <img src="<%= shop.logo %>" alt="logo" class="w-full h-full object-cover">
+                    <% } else { %>
+                      <i class="fas fa-store"></i>
+                    <% } %>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800"><%= shop.shopName %></p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <% if(shop.owner) { %>
+                  <p class="font-medium text-slate-700"><%= shop.owner.name %></p>
+                  <p class="text-xs text-slate-500"><%= shop.owner.email %></p>
+                <% } else { %>
+                  <span class="text-slate-400">N/A</span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4">
+                <p class="text-slate-600 truncate max-w-[200px]" title="<%= shop.address %>"><i class="fas fa-map-marker-alt text-slate-400 mr-1"></i> <%= shop.address %></p>
+                <p class="text-xs text-slate-500 mt-0.5"><i class="fas fa-phone text-slate-400 mr-1"></i> <%= shop.phone %></p>
+              </td>
+              <td class="px-6 py-4">
+                <% if(shop.isActive) { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Inactive
+                  </span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <form action="/admin/shops/<%= shop._id %>/toggle-status" method="POST" class="inline-block">
+                  <% if(shop.isActive) { %>
+                    <button type="submit" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Deactivate">
+                      <i class="fas fa-ban"></i>
+                    </button>
+                  <% } else { %>
+                    <button type="submit" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Activate">
+                      <i class="fas fa-check-circle"></i>
+                    </button>
+                  <% } %>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+              <i class="fas fa-store-slash text-4xl mb-3 text-slate-300"></i>
+              <p>No pet shops found</p>
+            </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

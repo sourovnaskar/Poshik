@@ -1,0 +1,88 @@
+<!-- Mobile Overlay -->
+<div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-20 hidden lg:hidden backdrop-blur-sm transition-all duration-300"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="glass fixed lg:static inset-y-0 left-0 z-30 w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col h-full shadow-2xl lg:shadow-none">
+  <!-- Logo -->
+  <div class="h-20 flex items-center justify-between px-6 border-b border-slate-200/50">
+    <a href="/admin/dashboard" class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+        <i class="fas fa-paw text-xl"></i>
+      </div>
+      <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 tracking-tight">Poshik</span>
+    </a>
+    <button id="closeSidebarBtn" class="lg:hidden text-slate-400 hover:text-slate-600 transition-colors">
+      <i class="fas fa-times text-xl"></i>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 custom-scrollbar">
+    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Admin Dashboard' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-chart-pie w-5 text-center"></i>
+      Dashboard
+    </a>
+    
+    <div class="pt-4 pb-2">
+      <p class="px-4 text-xs font-bold uppercase tracking-wider text-slate-400">Management</p>
+    </div>
+
+    <a href="/admin/users" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Manage Users' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-users w-5 text-center"></i>
+      Users
+    </a>
+
+    <a href="/admin/doctors" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Manage Doctors' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-user-md w-5 text-center"></i>
+      Doctors
+    </a>
+
+    <a href="/admin/shops" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Manage Shops' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-store w-5 text-center"></i>
+      Pet Shops
+    </a>
+
+    <a href="/admin/kyc" class="flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'KYC Applications' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-id-card w-5 text-center"></i>
+        KYC Review
+      </div>
+      <!-- Optional: Badge for pending KYC could go here -->
+    </a>
+
+    <div class="pt-4 pb-2">
+      <p class="px-4 text-xs font-bold uppercase tracking-wider text-slate-400">Monitoring</p>
+    </div>
+
+    <a href="/admin/categories" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Product Categories' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-tags w-5 text-center"></i>
+      Categories
+    </a>
+
+    <a href="/admin/products" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Monitor Products' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-box-open w-5 text-center"></i>
+      Products
+    </a>
+
+    <a href="/admin/appointments" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Monitor Appointments' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-calendar-check w-5 text-center"></i>
+      Appointments
+    </a>
+
+    <a href="/admin/orders" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 <%= title === 'Monitor Orders & Payments' ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' %>">
+      <i class="fas fa-shopping-bag w-5 text-center"></i>
+      Orders & Payments
+    </a>
+  </nav>
+
+  <!-- User Profile Bottom -->
+  <div class="p-4 border-t border-slate-200/50">
+    <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white shadow-sm border border-slate-100">
+      <img src="<%= user.image || 'https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff' %>" alt="Admin" class="w-10 h-10 rounded-full object-cover">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-slate-800 truncate"><%= user.name || 'Admin User' %></p>
+        <p class="text-xs text-slate-500 truncate"><%= user.email || 'admin@poshik.com' %></p>
+      </div>
+    </div>
+  </div>
+</aside>

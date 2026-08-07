@@ -1,0 +1,27 @@
+    </main>
+  </div>
+  
+  <script>
+    // Sidebar toggle logic for mobile
+    const sidebar = document.getElementById('sidebar');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    if(mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', () => {
+        sidebar.classList.remove('-translate-x-full');
+        if(sidebarOverlay) sidebarOverlay.classList.remove('hidden');
+      });
+    }
+
+    const closeMenu = () => {
+      sidebar.classList.add('-translate-x-full');
+      if(sidebarOverlay) sidebarOverlay.classList.add('hidden');
+    };
+
+    if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeMenu);
+    if(sidebarOverlay) sidebarOverlay.addEventListener('click', closeMenu);
+  </script>
+</body>
+</html>
