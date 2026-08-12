@@ -119,7 +119,7 @@ class DoctorController {
           "error",
           "You already have a KYC application submitted. Please wait for admin review.",
         );
-        return res.redirect("/api/doctor/dashboard");
+        return res.redirect("/doctor/dashboard");
       }
 
       const { idType, addressProofType } = req.body;
@@ -128,7 +128,7 @@ class DoctorController {
 
       if (!files || !files.idProof || !files.addressProof) {
         req.flash("error", "ID Proof and Address Proof are mandatory!");
-        return res.redirect("/api/doctor/kyc-form");
+        return res.redirect("/doctor/kyc-form");
       }
 
       let uploadedUrls = {
@@ -175,7 +175,7 @@ class DoctorController {
         kycStatus: "Pending",
       });
       req.flash("success", "KYC Documents submitted successfully for review!");
-      return res.redirect("/api/doctor/dashboard");
+      return res.redirect("/doctor/dashboard");
     } catch (error) {
       console.error(error.message);
 
@@ -207,7 +207,7 @@ class DoctorController {
       }
 
       req.flash("error", "Something Error Occured , Please try Again !");
-      return res.redirect("/api/doctor/kyc/form");
+      return res.redirect("/doctor/kyc/form");
     }
   }
 
@@ -246,12 +246,12 @@ class DoctorController {
         !clinicAddress
       ) {
         req.flash("error", "All fields are required");
-        return res.redirect("/api/doctor/profile/form");
+        return res.redirect("/doctor/profile/form");
       }
       const existingProfile = await Doctor.findOne({ user: userId });
       if (existingProfile) {
         req.flash("error", "You already have an active profile.");
-        return res.redirect("/api/doctor/dashboard");
+        return res.redirect("/doctor/dashboard");
       }
       const creation = new Doctor({
         user: userId,
@@ -268,14 +268,14 @@ class DoctorController {
         "success",
         "Your Profile has been created Successfully and is now active!",
       );
-      return res.redirect("/api/doctor/dashboard");
+      return res.redirect("/doctor/dashboard");
     } catch (error) {
       console.error(error.message);
       req.flash(
         "error",
         "An error occurred while saving your profile. Please try again.",
       );
-      return res.redirect("/api/doctor/profile/form");
+      return res.redirect("/doctor/profile/form");
     }
   }
 
@@ -291,7 +291,7 @@ class DoctorController {
           "error",
           "Doctor profile not found. Please create your profile first.",
         );
-        return res.redirect("/api/doctor/profile/form");
+        return res.redirect("/doctor/profile/form");
       }
 
       const schedules = await DoctorSchedule.find({
@@ -305,7 +305,7 @@ class DoctorController {
     } catch (error) {
       console.error("Error fetching schedule page:", error.message);
       req.flash("error", "Could not load your schedule at this time.");
-      return res.redirect("/api/doctor/dashboard");
+      return res.redirect("/doctor/dashboard");
     }
   }
 
@@ -321,14 +321,14 @@ class DoctorController {
           "error",
           "Doctor profile not found. Please create your profile first.",
         );
-        return res.redirect("/api/doctor/profile/form");
+        return res.redirect("/doctor/profile/form");
       }
 
       const { date, startTime, endTime, maxPatients } = req.body;
 
       if (!date || !startTime || !endTime || !maxPatients) {
         req.flash("error", "All fields are required");
-        return res.redirect("/api/doctor/appointment/schedule");
+        return res.redirect("/doctor/appointment/schedule");
       }
       const existingSchedule = await DoctorSchedule.findOne({
         doctor: doctorProfile._id,
@@ -340,7 +340,7 @@ class DoctorController {
           "error",
           "You already have an active Schedule in that Time .",
         );
-        return res.redirect("/api/doctor/appointment/schedule");
+        return res.redirect("/doctor/appointment/schedule");
       }
       const schedule = new DoctorSchedule({
         doctor: doctorProfile._id,
@@ -352,14 +352,14 @@ class DoctorController {
 
       await schedule.save();
       req.flash("success", "Schedule Created");
-      return res.redirect("/api/doctor/dashboard");
+      return res.redirect("/doctor/dashboard");
     } catch (error) {
       console.error(error.message);
       req.flash(
         "error",
         "An error occurred while saving your Schedule. Please try again.",
       );
-      return res.redirect("/api/doctor/appointment/schedule");
+      return res.redirect("/doctor/appointment/schedule");
     }
   }
 
@@ -373,14 +373,14 @@ class DoctorController {
 
       if (!doctorProfile) {
         req.flash("error", "Doctor profile not found.");
-        return res.redirect("/api/doctor/profile/form");
+        return res.redirect("/doctor/profile/form");
       }
 
       const schedule = await DoctorSchedule.findById(scheduleId);
 
       if (!schedule) {
         req.flash("error", "Shift not found.");
-        return res.redirect("/api/doctor/appointment/schedule");
+        return res.redirect("/doctor/appointment/schedule");
       }
 
       if (schedule.doctor.toString() !== doctorProfile._id.toString()) {
@@ -388,7 +388,7 @@ class DoctorController {
           "error",
           "Unauthorized access. You can only edit your own shifts.",
         );
-        return res.redirect("/api/doctor/appointment/schedule");
+        return res.redirect("/doctor/appointment/schedule");
       }
 
       res.render("doctors/edit-schedule", {
@@ -398,7 +398,7 @@ class DoctorController {
     } catch (error) {
       console.error("Error loading edit page:", error.message);
       req.flash("error", "Could not load the edit page at this time.");
-      return res.redirect("/api/doctor/appointment/schedule");
+      return res.redirect("/doctor/appointment/schedule");
     }
   }
 
@@ -422,14 +422,14 @@ class DoctorController {
         { new: true },
       );
       req.flash("success", " Your Schedule Updated Successfully!! ");
-      return res.redirect("/api/doctor/appointment/schedule");
+      return res.redirect("/doctor/appointment/schedule");
     } catch (error) {
       console.error(error.message);
       req.flash(
         "error",
         "An error occurred while Update your Schedule!! Please try again.",
       );
-      return res.redirect("/api/doctor/appointment/schedule");
+      return res.redirect("/doctor/appointment/schedule");
     }
   }
 
@@ -442,14 +442,14 @@ class DoctorController {
         _id: appointmentId,
       });
       req.flash("success", "Your Schedule Successfully canceled.");
-      return res.redirect("/api/doctor/appointment/schedule");
+      return res.redirect("/doctor/appointment/schedule");
     } catch (error) {
       console.error(error.message);
       req.flash(
         "error",
         "An error occurred while Cancel your Schedule. Please try again.",
       );
-      return res.redirect("/api/doctor/appointment/schedule");
+      return res.redirect("/doctor/appointment/schedule");
     }
   }
 
@@ -463,7 +463,7 @@ class DoctorController {
 
       if (!doctorProfile) {
         req.flash("error", "Doctor profile not found.");
-        return res.redirect("/api/doctor/profile/form");
+        return res.redirect("/doctor/profile/form");
       }
 
       // Fetch appointments and populate related data
@@ -479,7 +479,7 @@ class DoctorController {
     } catch (error) {
       console.error("Error fetching appointments:", error.message);
       req.flash("error", "Could not load appointments.");
-      return res.redirect("/api/doctor/dashboard");
+      return res.redirect("/doctor/dashboard");
     }
   }
 
@@ -494,7 +494,7 @@ class DoctorController {
       const doctorProfile = await Doctor.findOne({ user: userId });
       if (!doctorProfile) {
         req.flash("error", "Unauthorized access.");
-        return res.redirect("/api/doctor/dashboard");
+        return res.redirect("/doctor/dashboard");
       }
 
       const appointment = await Appointment.findOne({
@@ -503,7 +503,7 @@ class DoctorController {
       });
       if (!appointment) {
         req.flash("error", "Appointment not found.");
-        return res.redirect("/api/doctor/appointments");
+        return res.redirect("/doctor/appointments");
       }
 
       // Update and save status
@@ -514,11 +514,11 @@ class DoctorController {
         "success",
         `Appointment status successfully updated to ${status}.`,
       );
-      return res.redirect("/api/doctor/appointments");
+      return res.redirect("/doctor/appointments");
     } catch (error) {
       console.error("Error updating appointment status:", error.message);
       req.flash("error", "Could not update appointment status.");
-      return res.redirect("/api/doctor/appointments");
+      return res.redirect("/doctor/appointments");
     }
   }
 
@@ -532,7 +532,7 @@ class DoctorController {
 
       if (!doctorProfile) {
         req.flash("error", "Doctor profile not found.");
-        return res.redirect("/api/doctor/profile/form");
+        return res.redirect("/doctor/profile/form");
       }
 
       // Fetch all Completed Appointments for this doctor
@@ -586,7 +586,7 @@ class DoctorController {
     } catch (error) {
       console.error("Error loading earnings:", error);
       req.flash("error", "Error loading earnings data.");
-      return res.redirect("/api/doctor/dashboard");
+      return res.redirect("/doctor/dashboard");
     }
   }
 
@@ -599,7 +599,7 @@ class DoctorController {
 
       if (!doctorProfile) {
         req.flash("error", "Doctor profile not found.");
-        return res.redirect("/api/doctor/profile/form");
+        return res.redirect("/doctor/profile/form");
       }
       const patients = await Appointment.find({
         doctor: doctorProfile._id,
@@ -613,7 +613,7 @@ class DoctorController {
     } catch (error) {
       console.error("Error loading My-patients:", error);
       req.flash("error", "Error loading earnings data.");
-      return res.redirect("/api/doctor/dashboard");
+      return res.redirect("/doctor/dashboard");
     }
   }
 }

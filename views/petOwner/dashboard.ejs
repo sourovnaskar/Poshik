@@ -18,11 +18,11 @@
                                                 && user ? user.name.split(' ')[0] : ' Friend' %>! 🐾</h2>
                                         <p class="text-secondary fs-5 mb-4">What does your furry friend need today?</p>
                                         <div class="d-flex flex-wrap gap-2">
-                                            <a href="/api/pet/view/shop"
+                                            <a href="/pet/view/shop"
                                                 class="btn btn-primary rounded-pill px-4 py-2 fw-medium shadow">
                                                 <i class="fa-solid fa-bone me-2"></i> Buy Food & Toys
                                             </a>
-                                            <a href="/api/pet/view/book-doctor"
+                                            <a href="/pet/view/book-doctor"
                                                 class="btn btn-outline-dark bg-white rounded-pill px-4 py-2 fw-medium shadow-sm border-0">
                                                 <i class="fa-solid fa-stethoscope me-2"></i> Book a Vet
                                             </a>
@@ -50,7 +50,7 @@
                             <h3 class="fw-bold mb-3">Add Your First Pet</h3>
                             <p class="text-muted mb-4 fs-5">Create a profile for your pet to start booking vets, buying
                                 supplies, and tracking their health.</p>
-                            <a href="/api/pet/add" class="btn btn-primary rounded-pill px-5 py-3 fs-5 shadow">
+                            <a href="/pet/add" class="btn btn-primary rounded-pill px-5 py-3 fs-5 shadow">
                                 <i class="fa-solid fa-plus me-2"></i> Add Pet Profile
                             </a>
                         </div>
@@ -65,7 +65,7 @@
                                 <div>
                                     <div class="d-flex justify-content-between align-items-end mb-3">
                                         <h4 class="fw-bold mb-0">My Pets</h4>
-                                        <a href="/api/pet/add"
+                                        <a href="/pet/add"
                                             class="text-decoration-none fw-bold text-primary bg-primary bg-opacity-10 px-3 py-1 rounded-pill"><i
                                                 class="fa-solid fa-plus me-1"></i> Add New</a>
                                     </div>
@@ -87,7 +87,7 @@
                                                         <p class="text-muted small mb-3">
                                                             <%= pet.breed || pet.species %>
                                                         </p>
-                                                        <a href="/api/pet/profile/<%= pet._id %>"
+                                                        <a href="/pet/profile/<%= pet._id %>"
                                                             class="btn btn-sm btn-light border rounded-pill w-100 text-primary fw-medium">View
                                                             Profile</a>
                                                     </div>
@@ -114,23 +114,19 @@
                                                                         <i class="fa-solid fa-calendar-check fs-4"></i>
                                                                     </div>
                                                                     <div>
-                                                                        <h6 class="fw-bold mb-1">Dr. <%= appt.doctorName
-                                                                                %>
+                                                                        <h6 class="fw-bold mb-1">Dr. <%= appt.doctor ? appt.doctor.name : 'Unknown' %>
                                                                         </h6>
                                                                         <p class="text-muted mb-0 small">
                                                                             <i class="fa-regular fa-clock me-1"></i>
-                                                                            <%= new
-                                                                                Date(appt.date).toLocaleDateString('en-US',
-                                                                                { weekday: 'short' , month: 'short' ,
-                                                                                day: 'numeric' }) %> at <%= appt.time %>
-                                                                                    <span class="mx-2">•</span>
-                                                                                    <i class="fa-solid fa-paw me-1"></i>
-                                                                                    <%= appt.petName %>
+                                                                            <%= new Date(appt.appointmentDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                                                                                <span class="mx-2">•</span>
+                                                                                <i class="fa-solid fa-paw me-1"></i>
+                                                                                <%= appt.pet ? appt.pet.name : 'Unknown' %>
                                                                         </p>
                                                                     </div>
                                                                 </div>
                                                                 <span
-                                                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-medium border border-success border-opacity-25">Confirmed</span>
+                                                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2 fw-medium border border-success border-opacity-25"><%= appt.status %></span>
                                                             </div>
                                                         </div>
                                                         <% }) %>
@@ -143,7 +139,7 @@
                                                         <h6 class="fw-bold text-dark">No appointments scheduled</h6>
                                                         <p class="text-muted small mb-3">Keep your pets healthy with
                                                             regular checkups.</p>
-                                                        <a href="/api/pet/view/book-doctor"
+                                                        <a href="/pet/view/book-doctor"
                                                             class="btn btn-outline-primary btn-sm rounded-pill px-4 py-2 fw-medium">Find
                                                             a Vet</a>
                                                     </div>
@@ -189,7 +185,7 @@
                                     <div
                                         class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                                         <h5 class="fw-bold mb-0">Recent Order</h5>
-                                        <a href="/owner/orders"
+                                        <a href="/pet/orders"
                                             class="text-primary text-decoration-none small fw-bold bg-primary bg-opacity-10 px-3 py-1 rounded-pill">See
                                             All</a>
                                     </div>
@@ -206,13 +202,13 @@
                                                         </span>
                                                     </div>
                                                     <h6 class="fw-bold mb-1 text-truncate">
-                                                        <%= latestOrder.shopName %>
+                                                        <%= latestOrder.shop ? latestOrder.shop.shopName : 'Unknown Shop' %>
                                                     </h6>
                                                     <p class="text-primary fw-bold mb-0 fs-5">₹<%=
                                                             latestOrder.totalAmount %>
                                                     </p>
                                                 </div>
-                                                <a href="/owner/orders/<%= latestOrder._id %>"
+                                                <a href="/pet/orders"
                                                     class="btn btn-dark w-100 rounded-pill py-2 fw-medium shadow">Track
                                                     Package</a>
                                                 <% } else { %>
@@ -220,7 +216,7 @@
                                                         <i
                                                             class="fa-solid fa-bag-shopping fs-3 text-muted mb-2 opacity-50"></i>
                                                         <p class="text-muted small mb-3">You have no recent orders.</p>
-                                                        <a href="/api/pet/view/shop"
+                                                        <a href="/pet/view/shop"
                                                             class="btn btn-primary btn-sm rounded-pill px-4 fw-medium">Start
                                                             Shopping</a>
                                                     </div>
@@ -238,7 +234,7 @@
                                         <h5 class="fw-bold text-dark mb-2">Treat Your Pet</h5>
                                         <p class="small text-dark text-opacity-75 mb-4 fw-medium">Discover premium toys
                                             and treats in our marketplace today!</p>
-                                        <a href="/api/pet/view/shop"
+                                        <a href="/pet/view/shop"
                                             class="btn btn-danger rounded-pill px-4 py-2 fw-bold shadow">Shop
                                             Collection</a>
                                     </div>

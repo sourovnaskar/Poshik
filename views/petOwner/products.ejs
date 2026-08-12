@@ -1,285 +1,384 @@
 <%- include('./partials/header') %>
-    
-        <%- include('./partials/navbar') %>
+<%- include('./partials/navbar') %>
 
-            <style>
-                /* Shop Header Styling */
-                .storefront-banner {
-                    height: 250px;
-                    object-fit: cover;
-                    width: 100%;
-                    border-radius: 1rem;
-                }
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background: #f4f6fb; }
 
-                .storefront-logo {
-                    width: 120px;
-                    height: 120px;
-                    border-radius: 50%;
-                    border: 5px solid #fff;
-                    margin-top: -60px;
-                    position: relative;
-                    z-index: 2;
-                    background: #fff;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, .1);
-                    object-fit: cover;
-                }
+    /* ── Shop Banner ─────────────────────────────────────────── */
+    .store-hero {
+        position: relative; border-radius: 1.25rem;
+        overflow: hidden; margin-bottom: 0;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    }
+    .store-hero-img {
+        width: 100%; height: 220px; object-fit: cover;
+        display: block;
+    }
+    .store-hero-placeholder {
+        width: 100%; height: 220px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .store-hero-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%);
+    }
+    .store-hero-info {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        padding: 1.25rem 1.5rem;
+        display: flex; align-items: flex-end; gap: 1rem;
+    }
+    .store-logo {
+        width: 80px; height: 80px; border-radius: 50%;
+        border: 3px solid #fff;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        flex-shrink: 0;
+    }
+    .store-name { color: #fff; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; margin: 0; line-height: 1.2; }
+    .store-desc { color: rgba(255,255,255,0.8); font-size: 0.82rem; margin: 0; }
 
-                /* Product Card Hover */
-                .product-card {
-                    transition: transform 0.2s ease, box-shadow 0.2s ease;
-                }
+    /* ── Search + Category Bar ──────────────────────────────── */
+    .filter-bar {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        padding: 0.85rem 1.25rem;
+        display: flex; flex-wrap: wrap; gap: 0.75rem;
+        align-items: center;
+        position: sticky; top: 0; z-index: 100;
+    }
+    .search-input-wrap {
+        position: relative; flex: 1; min-width: 180px;
+    }
+    .search-input-wrap input {
+        border-radius: 50rem;
+        padding-left: 2.5rem;
+        border: 1.5px solid #dee2e6;
+        font-size: 0.88rem;
+        transition: border-color 0.2s;
+    }
+    .search-input-wrap input:focus { border-color: #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,.1); }
+    .search-input-wrap .search-icon {
+        position: absolute; left: 0.9rem; top: 50%;
+        transform: translateY(-50%); color: #6c757d; font-size: 0.85rem;
+    }
+    .cat-pill {
+        border-radius: 50rem; padding: 0.3rem 0.9rem;
+        font-size: 0.8rem; font-weight: 600; white-space: nowrap;
+        text-decoration: none; transition: all 0.15s;
+        border: 1.5px solid #dee2e6; color: #495057; background: #fff;
+    }
+    .cat-pill:hover, .cat-pill.active {
+        background: #0d6efd; color: #fff; border-color: #0d6efd;
+    }
+    .search-chip-sm {
+        display: inline-flex; align-items: center; gap: 0.3rem;
+        background: #e9f0ff; color: #0d6efd;
+        border-radius: 50rem; padding: 0.2em 0.65em;
+        font-size: 0.75rem; font-weight: 600;
+    }
 
-                .product-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
-                }
+    /* ── Product Cards ──────────────────────────────────────── */
+    .product-card {
+        border: none; border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        overflow: hidden;
+        transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s;
+        display: flex; flex-direction: column;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+    .product-img-wrap {
+        height: 190px; background: #f8f9fa;
+        display: flex; align-items: center; justify-content: center;
+        position: relative; overflow: hidden;
+    }
+    .product-img-wrap img { max-height: 100%; object-fit: contain; transition: transform 0.35s; }
+    .product-card:hover .product-img-wrap img { transform: scale(1.06); }
+    .discount-tag {
+        position: absolute; top: 10px; left: 10px;
+        background: #dc3545; color: #fff;
+        font-size: 0.7rem; font-weight: 700;
+        padding: 0.2em 0.6em; border-radius: 50rem;
+    }
+    .out-of-stock-overlay {
+        position: absolute; inset: 0;
+        background: rgba(255,255,255,0.7);
+        display: flex; align-items: center; justify-content: center;
+    }
+    .add-cart-btn {
+        border-radius: 50rem; font-weight: 700;
+        font-size: 0.85rem; padding: 0.55rem 0;
+        letter-spacing: 0.02em; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .add-cart-btn:hover:not(:disabled) { transform: scale(1.03); box-shadow: 0 4px 12px rgba(13,110,253,0.25); }
 
-                /* Sticky Category Nav */
-                .sticky-categories {
-                    position: sticky;
-                    top: 0;
-                    z-index: 1020;
-                    background: rgba(255, 255, 255, 0.95);
-                    backdrop-filter: blur(10px);
-                }
-            </style>
+    /* ── Empty State ─────────────────────────────────────────── */
+    .empty-state {
+        background: #fff; border-radius: 1.25rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        padding: 4rem 2rem; text-align: center;
+    }
 
-            <!-- Remember: We are using d-flex and NO .row wrapper to keep the sidebar intact! -->
-            <div class="d-flex bg-light min-vh-100">
+    /* Toast container */
+    .toast-stack { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 1090; display: flex; flex-direction: column; gap: 0.5rem; }
+    .custom-toast {
+        min-width: 280px; padding: 0.75rem 1.25rem;
+        border-radius: 0.75rem;
+        font-size: 0.88rem; font-weight: 600;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        display: flex; align-items: center; gap: 0.6rem;
+        animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeOut { to { opacity: 0; transform: translateY(-8px); } }
+    .toast-success { background: #198754; color: #fff; }
+    .toast-error   { background: #dc3545; color: #fff; }
+    .toast-info    { background: #0d6efd; color: #fff; }
+</style>
 
-                <!-- Include User Sidebar -->
+<div class="d-flex bg-light min-vh-100">
+    <main class="flex-grow-1 px-md-4 py-4 mb-5" style="width: 0; overflow-x: hidden;">
 
+        <!-- Back button -->
+        <div class="mb-3">
+            <a href="/pet/view/shop" class="text-decoration-none text-muted fw-semibold small">
+                <i class="bi bi-arrow-left me-1"></i>Back to Shops
+            </a>
+        </div>
 
-                <!-- Main Content Area -->
-                <main class="flex-grow-1 px-md-4 py-4 mb-5" style="width: 0; overflow-x: hidden;">
+        <%- include('./partials/flash') %>
 
-                    <!-- Back Button & Flash Messages -->
-                    <div class="mb-3">
-                        <a href="/api/pet/view/shop" class="text-decoration-none text-muted fw-bold">
-                            <i class="bi bi-arrow-left me-1"></i> Back to Shops
-                        </a>
-                    </div>
-                    <%- include('./partials/flash') %>
-
-                        <!-- Shop Header Profile -->
-                        <div class="bg-white rounded-4 shadow-sm mb-4 pb-4 text-center position-relative border-0">
-                            <% if (shop.logo) { %>
-                                <img src="<%= shop.logo %>" alt="<%= shop.shopName %> Banner" class="storefront-banner">
-                                <% } else { %>
-                                    <div
-                                        class="storefront-banner bg-secondary-subtle d-flex justify-content-center align-items-center">
-                                        <i class="bi bi-shop text-secondary opacity-50 display-1"></i>
-                                    </div>
-                                    <% } %>
-
-                                        <img src="<%= shop.logo || 'https://ui-avatars.com/api/?name=' + shop.shopName + '&background=0D8ABC&color=fff' %>"
-                                            alt="<%= shop.shopName %> Logo" class="storefront-logo mx-auto">
-
-                                        <h1 class="h2 fw-bold text-dark mt-2 mb-1">
-                                            <%= shop.shopName %>
-                                        </h1>
-                                        <p class="text-muted mb-3">
-                                            <%= shop.description || 'Welcome to our digital storefront!' %>
-                                        </p>
-
-
-                        </div>
-
-                        <!-- Sticky Categories Bar (Optional feature for later) -->
-                        <div
-                            class="sticky-categories border-bottom pb-2 pt-3 mb-4 d-flex gap-3 overflow-x-auto shadow-sm px-3 rounded-3">
-                            <a href="/api/pet/view/products/<%= shop._id %>"
-                                class="text-decoration-none fw-bold <%= !selectedCategoryId ? 'text-primary border-bottom border-primary border-3' : 'text-muted' %> pb-2"
-                                style="white-space: nowrap;">
-                                All Products
-                            </a>
-                            <% if (typeof categories !=='undefined' && categories.length> 0) { %>
-                                <% categories.forEach(category=> { %>
-
-                                    <!-- If the category ID matches the URL query, highlight it -->
-                                    <a href="/api/pet/view/products/<%= shop._id %>?category=<%= category._id %>"
-                                        class="text-decoration-none fw-bold <%= selectedCategoryId === category._id.toString() ? 'text-primary border-bottom border-primary border-3' : 'text-muted' %> pb-2"
-                                        style="white-space: nowrap;">
-                                        <%= category.name %>
-                                    </a>
-
-                                    <% }) %>
-                                        <% } %>
-                        </div>
-
-                        <!-- Products Grid -->
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
-                            <% if (typeof products !=='undefined' && products.length> 0) { %>
-                                <% products.forEach(product=> { %>
-                                    <div class="col">
-                                        <div
-                                            class="card h-100 border-0 shadow-sm product-card rounded-4 overflow-hidden">
-
-                                            <!-- Product Image -->
-                                            <div class="position-relative bg-white text-center p-3"
-                                                style="height: 200px;">
-                                                <% if (product.images && product.images.length> 0) { %>
-                                                    <img src="<%= product.images[0] %>" alt="<%= product.name %>"
-                                                        class="img-fluid h-100 object-fit-contain">
-                                                    <% } else { %>
-                                                        <i
-                                                            class="bi bi-box-seam display-1 text-muted opacity-25 d-flex h-100 align-items-center justify-content-center"></i>
-                                                        <% } %>
-
-                                                            <!-- Discount Badge -->
-                                                            <% if (product.discountPercentage> 0) { %>
-                                                                <span
-                                                                    class="position-absolute top-0 start-0 m-3 badge bg-danger">
-                                                                    <%= product.discountPercentage %>% OFF
-                                                                </span>
-                                                                <% } %>
-                                            </div>
-
-                                            <div class="card-body bg-light border-top d-flex flex-column">
-                                                <!-- Category -->
-                                                <small class="text-muted text-uppercase fw-bold mb-1"
-                                                    style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                                                    <%= product.category ? product.category.name : 'General' %>
-                                                </small>
-
-                                                <!-- Title -->
-                                                <h5 class="card-title fw-bold text-dark mb-2 text-truncate"
-                                                    title="<%= product.name %>">
-                                                    <%= product.name %>
-                                                </h5>
-
-                                                <!-- Pricing -->
-                                                <div
-                                                    class="mt-auto d-flex align-items-end justify-content-between mb-3">
-                                                    <div>
-                                                        <span class="fs-5 fw-bold text-success">₹<%= product.price %>
-                                                        </span>
-                                                        <% if (product.mrp> product.price) { %>
-                                                            <small
-                                                                class="text-muted text-decoration-line-through ms-1">₹
-                                                                <%= product.mrp %>
-                                                            </small>
-                                                            <% } %>
-                                                    </div>
-                                                    <small class="text-muted">
-                                                        <%= product.stock> 0 ? 'In Stock' : 'Out of Stock' %>
-                                                    </small>
-                                                </div>
-
-                                                <!-- Add to Cart Form -->
-                                                <!-- AJAX Add to Cart Button -->
-                                                <button type="button"
-                                                    onclick="addToCart('<%= product._id %>', '<%= shop._id %>')"
-                                                    class="btn w-100 fw-bold mt-auto <%= product.stock > 0 ? 'btn-primary' : 'btn-secondary disabled' %>">
-                                                    <% if (product.stock> 0) { %>
-                                                        <i class="bi bi-cart-plus me-1"></i> Add to Cart
-                                                        <% } else { %>
-                                                            Out of Stock
-                                                            <% } %>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% }) %>
-                                        <% } else { %>
-                                            <!-- Empty State -->
-                                            <div class="col-12 text-center py-5 bg-white rounded-4 shadow-sm border-0">
-                                                <i
-                                                    class="bi bi-box2-heart display-1 text-muted opacity-25 d-block mb-3"></i>
-                                                <h4 class="fw-bold text-dark">No Products Available</h4>
-                                                <p class="text-muted">This shop hasn't listed any items yet. Check back
-                                                    soon!</p>
-                                            </div>
-                                            <% } %>
-                        </div>
-
-                </main>
-            </div>
-            <!-- Replace Cart Confirmation Modal -->
-            <div class="modal fade" id="replaceCartModal" tabindex="-1" aria-labelledby="replaceCartModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow">
-                        <div class="modal-header bg-danger text-white border-0">
-                            <h5 class="modal-title fw-bold" id="replaceCartModalLabel"><i
-                                    class="bi bi-exclamation-triangle-fill me-2"></i>Replace Cart?</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body py-4">
-                            <p class="mb-0 text-dark">Your cart currently contains items from a different pet shop. Do
-                                you
-                                want to clear your current cart and start a new order from this shop?</p>
-                        </div>
-                        <div class="modal-footer bg-light border-0">
-                            <button type="button" class="btn btn-secondary fw-bold"
-                                data-bs-dismiss="modal">Cancel</button>
-                            <!-- The confirm button will be injected with the product/shop ID dynamically -->
-                            <button type="button" class="btn btn-danger fw-bold" id="confirmReplaceBtn">Yes, Clear &
-                                Replace</button>
-                        </div>
-                    </div>
+        <!-- ── Store Hero Banner ────────────────────────────────── -->
+        <div class="store-hero mb-4">
+            <% if (shop.logo) { %>
+                <img src="<%= shop.logo %>" class="store-hero-img" alt="<%= shop.shopName %>">
+            <% } else { %>
+                <div class="store-hero-placeholder">
+                    <i class="bi bi-shop text-white opacity-40 display-1"></i>
+                </div>
+            <% } %>
+            <div class="store-hero-overlay"></div>
+            <div class="store-hero-info">
+                <img src="<%= shop.logo || 'https://ui-avatars.com/?name=' + encodeURIComponent(shop.shopName) + '&background=ffffff&color=0d6efd&size=80' %>"
+                     alt="<%= shop.shopName %>" class="store-logo">
+                <div>
+                    <p class="store-name"><%= shop.shopName %></p>
+                    <p class="store-desc"><%= shop.description || 'Welcome to our storefront!' %></p>
                 </div>
             </div>
+        </div>
 
-            <script>
-                // Initialize Bootstrap Modal
-                const replaceCartModal = new bootstrap.Modal(document.getElementById('replaceCartModal'));
-                const confirmReplaceBtn = document.getElementById('confirmReplaceBtn');
+        <!-- ── Filter Bar: Search + Categories ─────────────────── -->
+        <div class="filter-bar mb-4">
+            <!-- Search -->
+            <form action="/pet/view/products/<%= shop._id %>" method="GET" class="search-input-wrap">
+                <% if (selectedCategoryId) { %>
+                    <input type="hidden" name="category" value="<%= selectedCategoryId %>">
+                <% } %>
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" name="search" class="form-control"
+                       placeholder="Search products..."
+                       value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+            </form>
 
-                // 1. The Main Add to Cart Function
-                async function addToCart(productId, shopId) {
-                    try {
-                        const response = await fetch('/api/pet/cart/add', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ productId, shopId })
-                        });
+            <!-- Category Pills -->
+            <div class="d-flex gap-2 overflow-x-auto flex-nowrap">
+                <a href="/pet/view/products/<%= shop._id %><%= searchQuery ? '?search=' + searchQuery : '' %>"
+                   class="cat-pill <%= !selectedCategoryId ? 'active' : '' %>">All</a>
+                <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                    <% categories.forEach(cat => { %>
+                        <a href="/pet/view/products/<%= shop._id %>?category=<%= cat._id %><%= searchQuery ? '&search=' + searchQuery : '' %>"
+                           class="cat-pill <%= selectedCategoryId === cat._id.toString() ? 'active' : '' %>">
+                            <%= cat.name %>
+                        </a>
+                    <% }) %>
+                <% } %>
+            </div>
 
-                        const data = await response.json();
+            <!-- Active search chip -->
+            <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                <span class="search-chip-sm">
+                    <i class="bi bi-search"></i><%= searchQuery %>
+                    <a href="/pet/view/products/<%= shop._id %><%= selectedCategoryId ? '?category=' + selectedCategoryId : '' %>"
+                       class="text-primary ms-1 text-decoration-none">✕</a>
+                </span>
+            <% } %>
+        </div>
 
-                        // CONFLICT DETECTED: Show the modal!
-                        if (response.status === 409) {
-                            // Attach the IDs to the confirm button so it knows what to replace
-                            confirmReplaceBtn.onclick = () => replaceCart(productId, shopId);
-                            replaceCartModal.show();
-                        }
-                        // SUCCESS
-                        else if (response.ok) {
-                            // Optional: Show a little toast notification or update a cart badge here
-                            alert(data.message); // Replace with a nice UI toast later!
-                        }
-                        // ERROR
-                        else {
-                            alert(data.message || 'Error adding to cart.');
-                        }
-                    } catch (error) {
-                        console.error('Fetch error:', error);
-                        alert('Something went wrong checking your cart.');
-                    }
-                }
+        <!-- ── Products Grid ────────────────────────────────────── -->
+        <% if (typeof products !== 'undefined' && products.length > 0) { %>
+            <p class="text-muted small mb-3"><strong><%= products.length %></strong> product<%= products.length !== 1 ? 's' : '' %> found</p>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 row-cols-xxl-4 g-4">
+                <% products.forEach(product => { %>
+                    <div class="col">
+                        <div class="product-card h-100">
+                            <!-- Image -->
+                            <div class="product-img-wrap">
+                                <% if (product.images && product.images.length > 0) { %>
+                                    <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+                                <% } else { %>
+                                    <i class="bi bi-box-seam text-muted opacity-25" style="font-size:4rem;"></i>
+                                <% } %>
+                                <% if (product.discountPercentage > 0) { %>
+                                    <span class="discount-tag"><%= product.discountPercentage %>% OFF</span>
+                                <% } %>
+                                <% if (product.stock === 0) { %>
+                                    <div class="out-of-stock-overlay">
+                                        <span class="badge bg-secondary px-3 py-2">Out of Stock</span>
+                                    </div>
+                                <% } %>
+                            </div>
 
-                // 2. The Override Function (When they click 'Yes' in the modal)
-                async function replaceCart(productId, shopId) {
-                    try {
-                        const response = await fetch('/api/pet/cart/replace', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ productId, shopId })
-                        });
+                            <!-- Body -->
+                            <div class="p-3 d-flex flex-column flex-grow-1">
+                                <span class="text-uppercase fw-bold text-primary mb-1" style="font-size:0.68rem; letter-spacing:0.08em;">
+                                    <%= product.category ? product.category.name : 'General' %>
+                                </span>
+                                <h6 class="fw-bold text-dark mb-2 text-truncate" title="<%= product.name %>">
+                                    <%= product.name %>
+                                </h6>
 
-                        const data = await response.json();
+                                <!-- Price row -->
+                                <div class="d-flex align-items-center justify-content-between mt-auto mb-3">
+                                    <div>
+                                        <span class="fw-bold fs-5 text-success">₹<%= product.price %></span>
+                                        <% if (product.mrp > product.price) { %>
+                                            <small class="text-muted text-decoration-line-through ms-1">₹<%= product.mrp %></small>
+                                        <% } %>
+                                    </div>
+                                    <% if (product.stock > 0 && product.stock <= 5) { %>
+                                        <span class="text-warning" style="font-size:0.72rem; font-weight:600;">Only <%= product.stock %> left!</span>
+                                    <% } else if (product.stock > 5) { %>
+                                        <span class="text-muted" style="font-size:0.72rem;">In Stock</span>
+                                    <% } %>
+                                </div>
 
-                        if (response.ok) {
-                            replaceCartModal.hide();
-                            alert('Cart replaced successfully!'); // Replace with toast later
-                        } else {
-                            alert(data.message || 'Failed to replace cart.');
-                        }
-                    } catch (error) {
-                        console.error('Fetch error:', error);
-                        alert('Something went wrong replacing your cart.');
-                    }
-                }
-            </script>
-            <%- include('./partials/footer') %>
+                                <!-- Add to Cart -->
+                                <button type="button"
+                                        onclick="addToCart('<%= product._id %>', '<%= shop._id %>')"
+                                        class="btn add-cart-btn w-100 <%= product.stock > 0 ? 'btn-primary' : 'btn-secondary disabled' %>"
+                                        <%= product.stock === 0 ? 'disabled' : '' %>>
+                                    <% if (product.stock > 0) { %>
+                                        <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                                    <% } else { %>
+                                        Unavailable
+                                    <% } %>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+
+        <% } else { %>
+            <div class="empty-state">
+                <div style="font-size:4rem; opacity:0.15;">📦</div>
+                <h4 class="fw-bold text-dark mt-3">No Products Found</h4>
+                <p class="text-muted mb-3">
+                    <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+                        No products match "<strong><%= searchQuery %></strong>".
+                        <a href="/pet/view/products/<%= shop._id %>" class="text-decoration-none">Clear search</a>
+                    <% } else { %>
+                        This shop hasn't listed any items yet.
+                    <% } %>
+                </p>
+            </div>
+        <% } %>
+
+    </main>
+</div>
+
+<!-- ── Replace Cart Modal ─────────────────────────────────── -->
+<div class="modal fade" id="replaceCartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <div class="p-1">
+                    <h5 class="modal-title fw-bold text-dark mb-1">
+                        <i class="bi bi-cart-x text-danger me-2"></i>Replace Cart?
+                    </h5>
+                    <p class="text-muted small mb-0">Your cart has items from a different shop.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-3">
+                <div class="alert alert-warning border-0 rounded-3 py-2 small">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Clearing your cart will remove all existing items. Do you want to continue?
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger fw-bold rounded-pill px-4" id="confirmReplaceBtn">
+                    Yes, Clear & Replace
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast stack -->
+<div class="toast-stack" id="toastStack"></div>
+
+<script>
+    const replaceCartModal = new bootstrap.Modal(document.getElementById('replaceCartModal'));
+    const confirmReplaceBtn = document.getElementById('confirmReplaceBtn');
+
+    function showToast(msg, type = 'success') {
+        const stack = document.getElementById('toastStack');
+        const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+        const t = document.createElement('div');
+        t.className = `custom-toast toast-${type}`;
+        t.innerHTML = `<i class="bi ${icons[type] || icons.info}"></i><span>${msg}</span>`;
+        stack.appendChild(t);
+        setTimeout(() => t.remove(), 3200);
+    }
+
+    async function addToCart(productId, shopId) {
+        try {
+            const res = await fetch('/pet/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, shopId })
+            });
+            const data = await res.json();
+            if (res.status === 409) {
+                confirmReplaceBtn.onclick = () => replaceCart(productId, shopId);
+                replaceCartModal.show();
+            } else if (res.ok) {
+                showToast(data.message || 'Added to cart!', 'success');
+            } else {
+                showToast(data.message || 'Error adding to cart.', 'error');
+            }
+        } catch (e) {
+            showToast('Something went wrong.', 'error');
+        }
+    }
+
+    async function replaceCart(productId, shopId) {
+        try {
+            const res = await fetch('/pet/cart/replace', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, shopId })
+            });
+            const data = await res.json();
+            replaceCartModal.hide();
+            if (res.ok) {
+                showToast('Cart replaced successfully!', 'success');
+            } else {
+                showToast(data.message || 'Failed to replace cart.', 'error');
+            }
+        } catch (e) {
+            showToast('Something went wrong.', 'error');
+        }
+    }
+</script>
+
+<%- include('./partials/footer') %>

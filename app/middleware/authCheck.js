@@ -16,7 +16,7 @@ const authCheck = async (req, res, next) => {
   }
   if (!refreshToken) {
     req.flash("error", "Token is expired or invalid . Please login again");
-    return res.redirect("/api/auth/login");
+    return res.redirect("/auth/login");
   }
   try {
     const decodedRefresh = jwt.verify(
@@ -52,7 +52,7 @@ const authCheck = async (req, res, next) => {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     req.flash("error", "Token is expired or invalid . Please login again");
-    return res.redirect("/api/auth/login");
+    return res.redirect("/auth/login");
   }
 };
 module.exports = authCheck;

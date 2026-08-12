@@ -11,14 +11,14 @@
                 <h3 class="fw-bold text-dark mb-1"><i class="fa-solid fa-id-card me-2 text-primary"></i>Pet Profile</h3>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 flex-nowrap overflow-hidden">
-                        <li class="breadcrumb-item"><a href="/api/pet/dashboard" class="text-decoration-none text-truncate">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/pet/dashboard" class="text-decoration-none text-truncate">Dashboard</a></li>
                         <li class="breadcrumb-item active text-truncate" aria-current="page" style="max-width: 150px;"><%= petDetails.name %></li>
                     </ol>
                 </nav>
             </div>
             <div class="w-100 w-md-auto mt-2 mt-md-0">
                 <!-- Button spans 100% on mobile, auto on md+ screens -->
-                <a href="/api/pet/edit/<%= petDetails._id %>" class="btn btn-primary shadow-sm w-100">
+                <a href="/pet/edit/<%= petDetails._id %>" class="btn btn-primary shadow-sm w-100">
                     <i class="fa-solid fa-pen-to-square me-2"></i>Edit Profile
                 </a>
             </div>

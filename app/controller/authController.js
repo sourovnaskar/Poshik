@@ -20,7 +20,7 @@ class AuthController {
 
       if (confirmPassword !== password) {
         req.flash("error", "Password is not same");
-        return res.redirect("/api/auth/register");
+        return res.redirect("/auth/register");
       }
 
       if (role === "Admin" || role === "Super Admin") {
@@ -38,7 +38,7 @@ class AuthController {
         }
 
         req.flash("error", "User Already Exists.");
-        return res.redirect("/api/auth/register");
+        return res.redirect("/auth/register");
       }
 
       let kycStatus = "Not Applicable";
@@ -77,7 +77,7 @@ class AuthController {
       await sendVerificationEmail(user, token);
 
       req.flash("success", "User Registered SuccessFully ");
-      return res.redirect("/api/auth/login");
+      return res.redirect("/auth/login");
     } catch (error) {
       if (req.file) {
         try {
@@ -89,7 +89,7 @@ class AuthController {
       console.error("Not registered : ", error.message);
 
       req.flash("error", "Something Went wrong , Please try Again ");
-      return res.redirect("/api/auth/register");
+      return res.redirect("/auth/register");
     }
   }
 
@@ -105,24 +105,24 @@ class AuthController {
 
       if (!existingUser) {
         req.flash("error", "User does not Exists.");
-        return res.redirect("/api/auth/login");
+        return res.redirect("/auth/login");
       }
 
       const isMatched = await bcrypt.compare(password, existingUser.password);
       if (!isMatched) {
         req.flash("error", "Invalid email or Password");
-        return res.redirect("/api/auth/login");
+        return res.redirect("/auth/login");
       }
       if (!existingUser.isEmailVerify) {
         req.flash(
           "error",
           "Your Account is not verified , please check your mail to verify ",
         );
-        return res.redirect("/api/auth/login");
+        return res.redirect("/auth/login");
       }
       if (!existingUser.isActive) {
         req.flash("error", "Your Account has been  Blocked ");
-        return res.redirect("/api/auth/login");
+        return res.redirect("/auth/login");
       }
       let payload = {
         id: existingUser._id,
@@ -156,9 +156,9 @@ class AuthController {
       const redirectUrls = {
         Admin: "/admin/dashboard",
         "Super Admin": "/super-admin/dashboard",
-        Shop: "/api/shop/dashboard",
-        Owner: "/api/pet/dashboard",
-        Doctor: "/api/doctor/dashboard",
+        Shop: "/shop/dashboard",
+        Owner: "/pet/dashboard",
+        Doctor: "/doctor/dashboard",
       };
 
       const redirectPath = redirectUrls[existingUser.role];
@@ -166,13 +166,13 @@ class AuthController {
       if (redirectPath) {
         return res.redirect(redirectPath);
       } else {
-        return res.redirect("/api/auth/login");
+        return res.redirect("/auth/login");
       }
     } catch (error) {
       console.error("Not Logged In : ", error.message);
 
       req.flash("error", "Something Went wrong , Please try Again ");
-      return res.redirect("/api/auth/login");
+      return res.redirect("/auth/login");
     }
   }
 
@@ -187,19 +187,19 @@ class AuthController {
       const verification = await VerificationToken.findOne({ token });
       if (!verification) {
         req.flash("error", "Invalid or expired verification link.");
-        return res.redirect("/api/auth/login");
+        return res.redirect("/auth/login");
       }
 
       const user = await User.findById(verification.userId);
       if (!user) {
         req.flash("error", "User not found. Please register again.");
-        return res.redirect("/api/auth/register");
+        return res.redirect("/auth/register");
       }
 
       if (user.isEmailVerify) {
         await VerificationToken.deleteOne({ _id: verification._id });
         req.flash("success", "Your email is already verified. Please login.");
-        return res.redirect("/api/auth/login");
+        return res.redirect("/auth/login");
       }
 
       user.isEmailVerify = true;
@@ -208,11 +208,11 @@ class AuthController {
       await VerificationToken.deleteOne({ _id: verification._id });
 
       req.flash("success", "Email verified successfully! You can now login.");
-      return res.redirect("/api/auth/login");
+      return res.redirect("/auth/login");
     } catch (error) {
       console.error("Email Verification Error: ", error.message);
       req.flash("error", "Something went wrong. Please try again.");
-      return res.redirect("/api/auth/login");
+      return res.redirect("/auth/login");
     }
   }
 
@@ -221,7 +221,7 @@ class AuthController {
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
       req.flash("success", "Logout Successfully");
-      res.redirect("/api/auth/login");
+      res.redirect("/auth/login");
     } catch (error) {
       console.error(error.message);
       req.flash("error", "Something went wrong. Please try again.");

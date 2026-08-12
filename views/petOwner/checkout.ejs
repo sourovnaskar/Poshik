@@ -1,0 +1,213 @@
+<%- include('./partials/header') %>
+    <%- include('./partials/navbar') %>
+
+    <style>
+        .checkout-card {
+            border-radius: 1rem;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13,110,253,.15);
+        }
+        .order-item-img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+        .payment-option {
+            cursor: pointer;
+            border: 2px solid #dee2e6;
+            border-radius: 0.75rem;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .payment-option:has(input:checked) {
+            border-color: #0d6efd;
+            background: #f0f5ff;
+        }
+        .place-order-btn {
+            background: linear-gradient(135deg, #0d6efd, #6f42c1);
+            border: none;
+            font-size: 1.05rem;
+            padding: 0.75rem;
+            letter-spacing: 0.03em;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .place-order-btn:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+    </style>
+
+    <div class="d-flex bg-light min-vh-100">
+        <main class="flex-grow-1 px-md-4 py-4 mb-5" style="width: 0; overflow-x: hidden;">
+
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item"><a href="/pet/cart" class="text-decoration-none">My Cart</a></li>
+                    <li class="breadcrumb-item active text-muted">Checkout</li>
+                </ol>
+            </nav>
+
+            <h1 class="h3 fw-bold text-dark mb-4">Checkout</h1>
+            <%- include('./partials/flash') %>
+
+            <form action="/user/order/place" method="POST" id="checkout-form">
+                <div class="row g-4">
+
+                    <!-- Left: Shipping Address -->
+                    <div class="col-lg-7">
+                        <div class="bg-white checkout-card p-4 mb-4">
+                            <p class="section-title mb-3">
+                                <i class="bi bi-geo-alt-fill text-primary me-2"></i>Delivery Address
+                            </p>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label fw-medium small">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" id="name" name="name" class="form-control" placeholder="John Doe" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label fw-medium small">Phone Number <span class="text-danger">*</span></label>
+                                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="9XXXXXXXXX" pattern="[0-9]{10}" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="address" class="form-label fw-medium small">Street Address <span class="text-danger">*</span></label>
+                                    <input type="text" id="address" name="address" class="form-control" placeholder="House / Flat / Block, Street, Area" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label for="city" class="form-label fw-medium small">City <span class="text-danger">*</span></label>
+                                    <input type="text" id="city" name="city" class="form-control" placeholder="Mumbai" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="state" class="form-label fw-medium small">State <span class="text-danger">*</span></label>
+                                    <select id="state" name="state" class="form-select" required>
+                                        <option value="" disabled selected>Select state</option>
+                                        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+                                        <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+                                        <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+                                        <option>Himachal Pradesh</option><option>Jharkhand</option>
+                                        <option>Karnataka</option><option>Kerala</option>
+                                        <option>Madhya Pradesh</option><option>Maharashtra</option>
+                                        <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+                                        <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+                                        <option>Rajasthan</option><option>Sikkim</option>
+                                        <option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option>
+                                        <option>Uttar Pradesh</option><option>Uttarakhand</option>
+                                        <option>West Bengal</option><option>Delhi</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="postalCode" class="form-label fw-medium small">PIN Code <span class="text-danger">*</span></label>
+                                    <input type="text" id="postalCode" name="postalCode" class="form-control" placeholder="400001" pattern="[0-9]{6}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="bg-white checkout-card p-4">
+                            <p class="section-title mb-3">
+                                <i class="bi bi-credit-card-fill text-primary me-2"></i>Payment Method
+                            </p>
+
+                            <div class="d-flex flex-column gap-3">
+                                <!-- COD -->
+                                <label class="payment-option d-flex align-items-center p-3 gap-3">
+                                    <input type="radio" name="paymentMethod" value="COD" checked class="form-check-input mt-0" style="width:1.2rem;height:1.2rem;">
+                                    <div>
+                                        <div class="fw-bold">Cash on Delivery</div>
+                                        <small class="text-muted">Pay when your order arrives</small>
+                                    </div>
+                                    <span class="ms-auto badge bg-success-subtle text-success border border-success-subtle px-3">Available</span>
+                                </label>
+
+                                <!-- Razorpay — placeholder -->
+                                <label class="payment-option d-flex align-items-center p-3 gap-3 opacity-50">
+                                    <input type="radio" name="paymentMethod" value="ONLINE" class="form-check-input mt-0" style="width:1.2rem;height:1.2rem;" disabled>
+                                    <div>
+                                        <div class="fw-bold">Online Payment</div>
+                                        <small class="text-muted">UPI / Cards / Netbanking via Razorpay</small>
+                                    </div>
+                                    <span class="ms-auto badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3">Coming Soon</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Order Summary -->
+                    <div class="col-lg-5">
+                        <div class="bg-white checkout-card p-4 position-sticky" style="top:20px;">
+                            <p class="section-title mb-3">
+                                <i class="bi bi-receipt text-primary me-2"></i>Order Summary
+                            </p>
+
+                            <!-- Shop name -->
+                            <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom">
+                                <i class="bi bi-shop text-muted"></i>
+                                <span class="text-muted small">From:</span>
+                                <span class="fw-semibold small"><%= cart.activeShop.shopName %></span>
+                            </div>
+
+                            <!-- Items -->
+                            <% let subtotal = 0; %>
+                            <div class="d-flex flex-column gap-3 mb-3">
+                                <% cart.items.forEach(item => { %>
+                                    <% const itemTotal = item.product.price * item.quantity; subtotal += itemTotal; %>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <% if (item.product.images && item.product.images.length > 0) { %>
+                                            <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>" class="order-item-img border">
+                                        <% } else { %>
+                                            <div class="order-item-img bg-light border d-flex align-items-center justify-content-center text-muted">
+                                                <i class="bi bi-box"></i>
+                                            </div>
+                                        <% } %>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold small text-dark"><%= item.product.name %></div>
+                                            <div class="text-muted small">Qty: <%= item.quantity %> × ₹<%= item.product.price %></div>
+                                        </div>
+                                        <div class="fw-bold small">₹<%= itemTotal %></div>
+                                    </div>
+                                <% }) %>
+                            </div>
+
+                            <!-- Pricing breakdown -->
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between mb-1 small">
+                                    <span class="text-muted">Subtotal</span>
+                                    <span>₹<%= subtotal %></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3 small">
+                                    <span class="text-muted">Platform Fee</span>
+                                    <span>₹20</span>
+                                </div>
+                                <div class="d-flex justify-content-between fw-bold fs-5 border-top pt-3">
+                                    <span>Total</span>
+                                    <span class="text-success">₹<%= subtotal + 20 %></span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary place-order-btn w-100 mt-4 rounded-pill text-white fw-bold shadow">
+                                <i class="bi bi-bag-check-fill me-2"></i>Place Order
+                            </button>
+                            <a href="/pet/cart" class="btn btn-link w-100 text-muted text-decoration-none small mt-2">
+                                ← Back to Cart
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+
+        </main>
+    </div>
+
+<%- include('./partials/footer') %>

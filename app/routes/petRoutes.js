@@ -42,4 +42,13 @@ routes.post("/cart/add", authCheck, petController.addToCart);
 // POST route to override
 routes.post("/cart/replace", authCheck, petController.replaceCart);
 routes.get("/cart", authCheck, petController.viewCart);
+routes.post("/cart/update", authCheck, petController.updateCartItem);
+routes.post("/cart/remove", authCheck, petController.removeCartItem);
+
+// Checkout & Orders
+routes.get("/checkout", authCheck, petController.renderCheckout);
+routes.post("/order/place", authCheck, petController.placeOrder);
+routes.get("/order/:orderId/confirmation", authCheck, petController.orderConfirmation);
+routes.get("/orders", authCheck, petController.myOrders);
+
 module.exports = routes;

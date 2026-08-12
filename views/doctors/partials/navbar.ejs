@@ -38,15 +38,15 @@
         
         <!-- Dropdown Menu (Appears on hover) -->
         <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 hidden group-hover:block transition-all z-50">
-          <a href="/doctor/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition">My Profile</a>
+          <!-- <a href="/doctor/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition">My Profile</a> -->
           
           <!-- Add lock icon if KYC is not approved -->
-          <a href="<%= user.kycStatus === 'Approved' ? '/doctor/settings' : '#' %>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition <%= user.kycStatus !== 'Approved' ? 'opacity-50 cursor-not-allowed' : '' %>">
+          <!-- <a href="<%= user.kycStatus === 'Approved' ? '/doctor/settings' : '#' %>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition <%= user.kycStatus !== 'Approved' ? 'opacity-50 cursor-not-allowed' : '' %>">
             Settings <%= user.kycStatus !== 'Approved' ? '🔒' : '' %>
-          </a>
+          </a> -->
           
           <div class="border-t border-gray-100 mt-1 mb-1"></div>
-          <a href="/api/auth/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Logout</a>
+          <a href="/auth/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">Logout</a>
         </div>
       </div>
 

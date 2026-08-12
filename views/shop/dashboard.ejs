@@ -27,7 +27,7 @@
                                         <p class="mb-0 text-danger opacity-75 small">Complete your KYC to list your shop
                                             and start receiving orders.</p>
                                     </div>
-                                    <a href="/api/shop/kyc/form"
+                                    <a href="/shop/kyc/form"
                                         class="btn btn-danger mt-3 mt-sm-0 fw-bold text-nowrap shadow-sm">
                                         Complete KYC Now
                                     </a>
@@ -50,7 +50,7 @@
                                                         %>
                                                 </p>
                                             </div>
-                                            <a href="/api/shop/kyc/form"
+                                            <a href="/shop/kyc/form"
                                                 class="btn btn-danger mt-3 mt-sm-0 fw-bold text-nowrap shadow-sm">
                                                 Resubmit Documents
                                             </a>
@@ -64,7 +64,7 @@
                                                     <p class="mb-0 text-primary opacity-75 small">Set up your shop
                                                         details, description, and logo to start selling.</p>
                                                 </div>
-                                                <a href="/api/shop/details/form"
+                                                <a href="/shop/details/form"
                                                     class="btn btn-primary mt-3 mt-sm-0 fw-bold text-nowrap shadow-sm">
                                                     Create Profile Now
                                                 </a>
@@ -165,7 +165,7 @@
                                                                                                 totalProducts : '0' %>
                                                                                         </p>
                                                                                     </div>
-                                                                                    <a href="/api/shop/get/categories"
+                                                                                    <a href="/shop/get/categories"
                                                                                         class="text-decoration-none small fw-bold text-info mt-3 d-inline-block">
                                                                                         Manage Categories <i
                                                                                             class="bi bi-arrow-right"></i>
@@ -226,7 +226,7 @@
                                                                                 class="d-flex justify-content-between align-items-center mb-4">
                                                                                 <h5 class="fw-bold mb-0 text-dark">
                                                                                     Recent Orders</h5>
-                                                                                <a href="/api/shop/orders"
+                                                                                <a href="/shop/orders"
                                                                                     class="btn btn-sm btn-outline-primary">View
                                                                                     All</a>
                                                                             </div>
@@ -284,7 +284,7 @@
                                                                                                     </td>
                                                                                                     <td
                                                                                                         class="text-end">
-                                                                                                        <a href="#"
+                                                                                                        <a href="/shop/orders/<%= order._id %>"
                                                                                                             class="btn btn-sm btn-light border shadow-sm">Process</a>
                                                                                                     </td>
                                                                                                 </tr>
@@ -321,15 +321,18 @@
         <!-- ========================================== -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                // In your Express Controller, you will pass these arrays. 
-                // e.g., res.render('dashboard', { revenueData: [1200, 1900, 3000...], orderStats: [15, 5, 2] })
-                // If they don't exist yet, we inject fallback arrays so the charts render nicely anyway.
-                const revenueData = JSON.parse('<%- typeof revenueData !== "undefined" ? JSON.stringify(revenueData) : "[1000, 2500, 1800, 3200, 2100, 4500, 3900]" %>');
 
-                const revenueLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                // ── Real data injected by the server ─────────────────────────
+                const revenueLabels = <%- JSON.stringify(revenueLabels) %>;
+                const revenueData   = <%- JSON.stringify(revenueData) %>;
+                // [Pending, Confirmed, Processing, Shipped, Delivered, Cancelled]
+                const orderStats    = <%- JSON.stringify(orderStats) %>;
+                // ─────────────────────────────────────────────────────────────
 
-                // 1. Line Chart (Revenue)
+                // 1. LINE CHART — Revenue last 7 days
                 const ctxRev = document.getElementById('revenueChart').getContext('2d');
+                const hasRevenueData = revenueData.some(v => v > 0);
+
                 new Chart(ctxRev, {
                     type: 'line',
                     data: {
@@ -337,66 +340,136 @@
                         datasets: [{
                             label: 'Revenue (₹)',
                             data: revenueData,
-                            borderColor: '#0d6efd', // Bootstrap Primary Blue
-                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                            borderColor: '#0d6efd',
+                            backgroundColor: 'rgba(13, 110, 253, 0.08)',
                             borderWidth: 3,
-                            tension: 0.4, // Smooth curves
+                            tension: 0.4,
                             fill: true,
                             pointBackgroundColor: '#fff',
                             pointBorderColor: '#0d6efd',
                             pointBorderWidth: 2,
-                            pointRadius: 4
+                            pointRadius: 5,
+                            pointHoverRadius: 7
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => ' ₹' + ctx.parsed.y.toLocaleString('en-IN')
+                                }
+                            },
+                            // Show "No revenue yet" when all values are 0
+                            ...(hasRevenueData ? {} : {
+                                afterDraw: chart => {
+                                    const { ctx: c, width, height } = chart;
+                                    c.save();
+                                    c.textAlign = 'center';
+                                    c.textBaseline = 'middle';
+                                    c.fillStyle = '#adb5bd';
+                                    c.font = '14px Inter, sans-serif';
+                                    c.fillText('No delivered orders in the last 7 days', width / 2, height / 2);
+                                    c.restore();
+                                }
+                            })
                         },
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                grid: { borderDash: [5, 5], color: '#e9ecef' }
+                                grid: { borderDash: [5, 5], color: '#e9ecef' },
+                                ticks: {
+                                    callback: v => '₹' + v.toLocaleString('en-IN')
+                                }
                             },
-                            x: {
-                                grid: { display: false }
-                            }
+                            x: { grid: { display: false } }
                         }
                     }
                 });
 
-                // 2. Doughnut Chart (Order Statuses)
-                // 2. Doughnut Chart (Order Statuses)
-                const orderStats = JSON.parse('<%- typeof orderStats !== "undefined" ? JSON.stringify(orderStats) : "[12, 5, 3]" %>'); // e.g. [Delivered, Pending, Cancelled]
+                // 2. DOUGHNUT CHART — Orders by status (all 6 statuses)
+                const statusLabels = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+                const statusColors = [
+                    '#ffc107',  // Pending    — amber
+                    '#0dcaf0',  // Confirmed  — cyan
+                    '#0d6efd',  // Processing — blue
+                    '#6f42c1',  // Shipped    — purple
+                    '#198754',  // Delivered  — green
+                    '#dc3545',  // Cancelled  — red
+                ];
 
+                const totalOrders = orderStats.reduce((a, b) => a + b, 0);
                 const ctxOrders = document.getElementById('orderStatusChart').getContext('2d');
+
                 new Chart(ctxOrders, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Delivered', 'Pending', 'Cancelled'],
+                        labels: statusLabels,
                         datasets: [{
                             data: orderStats,
-                            backgroundColor: [
-                                '#198754', // Success Green
-                                '#ffc107', // Warning Yellow
-                                '#dc3545'  // Danger Red
-                            ],
-                            borderWidth: 0,
-                            hoverOffset: 4
+                            backgroundColor: statusColors,
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            hoverOffset: 6
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '75%', // Makes the ring thinner and cleaner
+                        cutout: '72%',
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { padding: 20, usePointStyle: true }
+                                labels: {
+                                    padding: 16,
+                                    usePointStyle: true,
+                                    pointStyleWidth: 10,
+                                    font: { size: 12 },
+                                    // Hide statuses that have 0 orders to keep legend clean
+                                    filter: (item, data) => data.datasets[0].data[item.index] > 0
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => {
+                                        const val = ctx.parsed;
+                                        const pct = totalOrders > 0 ? ((val / totalOrders) * 100).toFixed(1) : 0;
+                                        return ` ${ctx.label}: ${val} (${pct}%)`;
+                                    }
+                                }
                             }
                         }
-                    }
+                    },
+                    // Center label showing total
+                    plugins: [{
+                        id: 'centerText',
+                        afterDraw(chart) {
+                            const { ctx: c, width, height, chartArea } = chart;
+                            if (!chartArea) return;
+                            const cx = (chartArea.left + chartArea.right) / 2;
+                            const cy = (chartArea.top + chartArea.bottom) / 2;
+                            c.save();
+                            if (totalOrders === 0) {
+                                c.textAlign = 'center';
+                                c.textBaseline = 'middle';
+                                c.fillStyle = '#adb5bd';
+                                c.font = '13px Inter, sans-serif';
+                                c.fillText('No orders yet', cx, cy);
+                            } else {
+                                c.textAlign = 'center';
+                                c.textBaseline = 'middle';
+                                c.fillStyle = '#1a1a2e';
+                                c.font = 'bold 22px Inter, sans-serif';
+                                c.fillText(totalOrders, cx, cy - 8);
+                                c.fillStyle = '#6c757d';
+                                c.font = '12px Inter, sans-serif';
+                                c.fillText('Total Orders', cx, cy + 14);
+                            }
+                            c.restore();
+                        }
+                    }]
                 });
             });
         </script>

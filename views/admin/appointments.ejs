@@ -30,7 +30,7 @@
               <td class="px-6 py-4">
                 <% if(app.owner) { %>
                   <div class="flex items-center gap-2">
-                    <img src="<%= app.owner.profileImage || 'https://ui-avatars.com/api/?name='+app.owner.name %>" alt="" class="w-8 h-8 rounded-full">
+                    <img src="<%= app.owner.profileImage || 'https://ui-avatars.com/?name='+app.owner.name %>" alt="" class="w-8 h-8 rounded-full">
                     <span class="font-medium text-slate-700"><%= app.owner.name %></span>
                   </div>
                 <% } else { %>

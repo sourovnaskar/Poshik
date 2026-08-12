@@ -7,7 +7,7 @@
 
   <nav class="flex-1 px-4 py-4 space-y-2">
     <!-- Always Accessible -->
-    <a href="/api/doctor/dashboard"
+    <a href="/doctor/dashboard"
       class="flex items-center p-3 text-gray-700 bg-teal-50 rounded-lg hover:bg-teal-100 transition">
       <span>Dashboard</span>
     </a>
@@ -27,28 +27,28 @@
           <% const isApproved=user.kycStatus==='Approved' ; %>
 
             <!-- NEW: My Schedule (For creating available time slots) -->
-            <a href="<%= isApproved ? '/api/doctor/appointment/schedule' : '#' %>"
+            <a href="<%= isApproved ? '/doctor/appointment/schedule' : '#' %>"
               class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
               <span>My Schedule</span>
               <% if (!isApproved) { %> <span>🔒</span>
                 <% } %>
             </a>
 
-            <a href="<%= isApproved ? '/api/doctor/appointments' : '#' %>"
+            <a href="<%= isApproved ? '/doctor/appointments' : '#' %>"
               class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
               <span>Appointments</span>
               <% if (!isApproved) { %> <span>🔒</span>
                 <% } %>
             </a>
 
-            <a href="<%= isApproved ? '/api/doctor/patients' : '#' %>"
+            <a href="<%= isApproved ? '/doctor/patients' : '#' %>"
               class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
               <span>My Patients</span>
               <% if (!isApproved) { %> <span>🔒</span>
                 <% } %>
             </a>
 
-            <a href="<%= isApproved ? '/api/doctor/earnings' : '#' %>"
+            <a href="<%= isApproved ? '/doctor/earnings' : '#' %>"
               class="flex items-center justify-between p-3 rounded-lg <%= isApproved ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 cursor-not-allowed' %>">
               <span>Earnings</span>
               <% if (!isApproved) { %> <span>🔒</span>
@@ -63,7 +63,7 @@
         <p class="font-bold text-gray-800 truncate">
           <%= user.name %>
         </p>
-        <a href="/logout" class="text-red-500 hover:underline">Logout</a>
+        <a href="/auth/logout" class="text-red-500 hover:underline">Logout</a>
       </div>
     </div>
   </div>

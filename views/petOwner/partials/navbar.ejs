@@ -2,7 +2,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-2 px-3 px-md-4">
         <div class="container-fluid">
             <!-- Brand -->
-            <a class="navbar-brand fw-bold text-primary d-flex align-items-center me-4" href="/api/pet/dashboard">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center me-4" href="/pet/dashboard">
                 <i class="fa-solid fa-paw fs-3 me-2"></i> POSHIK
             </a>
 
@@ -17,12 +17,12 @@
             <div class="collapse navbar-collapse" id="petOwnerNavbar">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1 fw-medium">
                     <li class="nav-item">
-                        <a class="nav-link active rounded-pill px-3" href="/api/pet/dashboard">
+                        <a class="nav-link active rounded-pill px-3" href="/pet/dashboard">
                             <i class="fa-solid fa-house me-1 d-lg-none"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link rounded-pill px-3" href="/api/pet/owner/pets">
+                        <a class="nav-link rounded-pill px-3" href="/pet/owner/pets">
                             <i class="fa-solid fa-dog me-1 d-lg-none"></i> My Pets
                         </a>
                     </li>
@@ -34,9 +34,9 @@
                             <i class="fa-solid fa-bag-shopping me-1 d-lg-none"></i> Shop
                         </a>
                         <ul class="dropdown-menu border-0 shadow-sm rounded-4 mt-2" aria-labelledby="shoppingDropdown">
-                            <li><a class="dropdown-item py-2" href="/api/pet/view/shop"><i
+                            <li><a class="dropdown-item py-2" href="/pet/view/shop"><i
                                         class="fa-solid fa-store me-2 text-muted"></i> Pet Shops</a></li>
-                            <li><a class="dropdown-item py-2" href="/owner/orders"><i
+                            <li><a class="dropdown-item py-2" href="/user/orders"><i
                                         class="fa-solid fa-box-open me-2 text-muted"></i> My Orders</a></li>
                         </ul>
                     </li>
@@ -49,9 +49,9 @@
                         </a>
                         <ul class="dropdown-menu border-0 shadow-sm rounded-4 mt-2"
                             aria-labelledby="healthcareDropdown">
-                            <li><a class="dropdown-item py-2" href="/api/pet/view/book-doctor"><i
+                            <li><a class="dropdown-item py-2" href="/pet/view/book-doctor"><i
                                         class="fa-solid fa-stethoscope me-2 text-muted"></i> Book Doctor</a></li>
-                            <li><a class="dropdown-item py-2" href="/api/pet/appointements"><i
+                            <li><a class="dropdown-item py-2" href="/pet/appointements"><i
                                         class="fa-solid fa-calendar-check me-2 text-muted"></i> Appointments</a></li>
                         </ul>
                     </li>
@@ -59,7 +59,7 @@
 
                 <!-- Right Side (Cart & Profile) -->
                 <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0 border-top border-lg-0 pt-3 pt-lg-0">
-                    <a href="/api/pet/cart"
+                    <a href="/pet/cart"
                         class="btn btn-light rounded-circle position-relative p-2 d-flex align-items-center justify-content-center shadow-sm"
                         style="width: 40px; height: 40px;">
                         <i class="fa-solid fa-cart-shopping text-dark"></i>
@@ -87,9 +87,9 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item py-2" href="/api/pet/owner/profile"><i
+                            <li><a class="dropdown-item py-2" href="/pet/owner/profile"><i
                                         class="fa-solid fa-user-gear me-2 text-muted"></i> Profile Settings</a></li>
-                            <li><a class="dropdown-item py-2 text-danger fw-medium" href="/api/auth/logout"><i
+                            <li><a class="dropdown-item py-2 text-danger fw-medium" href="/auth/logout"><i
                                         class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
                         </ul>
                     </div>

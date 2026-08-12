@@ -1,7 +1,7 @@
 const transporter = require("../../config/emailConfig");
 
 const sendVerificationEmail = async (user, token) => {
-  const verificationLink = `${process.env.BASE_URL}/api/auth/verify-email/${token}`;
+  const verificationLink = `${process.env.BASE_URL}/auth/verify-email/${token}`;
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM,

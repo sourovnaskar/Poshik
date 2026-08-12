@@ -50,4 +50,17 @@ routes.post(
 );
 routes.get("/all/products", authCheck, shopControler.getProducts);
 
+// Product Edit & Delete
+routes.get("/products/edit/:productId", authCheck, shopControler.editProductForm);
+routes.post("/products/update/:productId", authCheck, upload.array("images", 4), shopControler.updateProduct);
+routes.post("/products/delete/:productId", authCheck, shopControler.deleteProduct);
+
+// Orders
+routes.get("/orders", authCheck, shopControler.getOrders);
+routes.get("/orders/:orderId", authCheck, shopControler.getOrderDetail);
+routes.post("/orders/:orderId/status", authCheck, shopControler.updateOrderStatus);
+
+// Earnings
+routes.get("/earnings", authCheck, shopControler.getEarnings);
+
 module.exports = routes;

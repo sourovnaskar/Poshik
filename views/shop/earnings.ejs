@@ -1,0 +1,495 @@
+<%- include('./partials/header') %>
+    <%- include('./partials/navbar') %>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ── Google Font ─────────────────────────────────────────── */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+
+        /* ── Metric Cards ─────────────────────────────────────────── */
+        .metric-card {
+            border: none;
+            border-radius: 1.1rem;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        }
+        .metric-card .card-glow {
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            opacity: 0.12;
+        }
+        .metric-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+        }
+        .metric-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+        .growth-badge {
+            font-size: 0.73rem;
+            font-weight: 700;
+            padding: 0.22em 0.65em;
+            border-radius: 50rem;
+        }
+
+        /* ── Chart Cards ─────────────────────────────────────────── */
+        .chart-card {
+            border: none;
+            border-radius: 1.1rem;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        }
+        .section-heading {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6c757d;
+        }
+
+        /* ── Table ────────────────────────────────────────────────── */
+        .earnings-table th {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #8a93a2;
+            border-bottom: 1px solid #f1f3f5;
+            padding: 0.9rem 1rem;
+        }
+        .earnings-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid #f8f9fa;
+            font-size: 0.88rem;
+            vertical-align: middle;
+        }
+        .earnings-table tr:last-child td { border-bottom: none; }
+        .earnings-table tr:hover td { background: #f8f9ff; }
+
+        /* ── Top Products Rank Badge ─────────────────────────────── */
+        .rank-badge {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 800;
+            flex-shrink: 0;
+        }
+        .rank-1 { background: #fff3cd; color: #856404; }
+        .rank-2 { background: #e2e3e5; color: #41464b; }
+        .rank-3 { background: #fde8d8; color: #923b0e; }
+        .rank-other { background: #f8f9fa; color: #6c757d; }
+
+        /* ── Progress bar ────────────────────────────────────────── */
+        .revenue-bar { height: 6px; border-radius: 50rem; background: #e9ecef; }
+        .revenue-bar-fill { height: 100%; border-radius: 50rem; background: linear-gradient(90deg, #0d6efd, #6f42c1); }
+
+        /* ── Txn avatar ─────────────────────────────────────────── */
+        .txn-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%; object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* ── Stat row in summary card ────────────────────────────── */
+        .stat-mini { font-size: 0.8rem; }
+    </style>
+
+    <div class="container-fluid">
+        <div class="row">
+            <%- include('./partials/sidebar') %>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 bg-light min-vh-100">
+
+                <%- include('./partials/flash') %>
+
+                <!-- ── Page Header ────────────────────────────────────────── -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                    <div>
+                        <h1 class="h3 fw-bold text-dark mb-1">Earnings</h1>
+                        <p class="text-muted small mb-0">Financial overview for <strong><%= shop.shopName %></strong></p>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-semibold">
+                        <i class="bi bi-circle-fill me-1" style="font-size:0.45rem;"></i>Live Data
+                    </span>
+                </div>
+
+                <!-- ── Top Metric Cards ───────────────────────────────────── -->
+                <div class="row g-3 mb-4">
+
+                    <!-- Total Earnings -->
+                    <div class="col-6 col-xl-3">
+                        <div class="metric-card bg-white p-4">
+                            <div class="card-glow bg-success"></div>
+                            <div class="d-flex align-items-start justify-content-between mb-3">
+                                <div class="metric-icon bg-success-subtle text-success">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+                                <span class="growth-badge
+                                    <%= monthGrowth >= 0 ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' %>">
+                                    <%= monthGrowth >= 0 ? '↑' : '↓' %> <%= Math.abs(monthGrowth) %>%
+                                </span>
+                            </div>
+                            <div class="metric-label text-muted mb-1">Total Earnings</div>
+                            <div class="metric-value text-dark">₹<%= parseFloat(totalEarnings).toLocaleString('en-IN') %></div>
+                            <div class="text-muted small mt-1">All time · <%= deliveredCount %> orders</div>
+                        </div>
+                    </div>
+
+                    <!-- This Month -->
+                    <div class="col-6 col-xl-3">
+                        <div class="metric-card bg-white p-4">
+                            <div class="card-glow bg-primary"></div>
+                            <div class="d-flex align-items-start justify-content-between mb-3">
+                                <div class="metric-icon bg-primary-subtle text-primary">
+                                    <i class="bi bi-calendar-month"></i>
+                                </div>
+                                <span class="growth-badge bg-primary-subtle text-primary">This Month</span>
+                            </div>
+                            <div class="metric-label text-muted mb-1">Monthly Revenue</div>
+                            <div class="metric-value text-dark">₹<%= parseFloat(thisMonthEarnings).toLocaleString('en-IN') %></div>
+                            <div class="text-muted small mt-1">
+                                vs ₹<%= parseFloat(thisWeekEarnings).toLocaleString('en-IN') %> this week
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today -->
+                    <div class="col-6 col-xl-3">
+                        <div class="metric-card bg-white p-4">
+                            <div class="card-glow bg-warning"></div>
+                            <div class="d-flex align-items-start justify-content-between mb-3">
+                                <div class="metric-icon bg-warning-subtle text-warning">
+                                    <i class="bi bi-sun"></i>
+                                </div>
+                                <span class="growth-badge bg-warning-subtle text-warning">Today</span>
+                            </div>
+                            <div class="metric-label text-muted mb-1">Today's Revenue</div>
+                            <div class="metric-value text-dark">₹<%= parseFloat(todayEarnings).toLocaleString('en-IN') %></div>
+                            <div class="text-muted small mt-1"><%= pendingCount %> orders in progress</div>
+                        </div>
+                    </div>
+
+                    <!-- Avg Order Value -->
+                    <div class="col-6 col-xl-3">
+                        <div class="metric-card bg-white p-4">
+                            <div class="card-glow bg-info"></div>
+                            <div class="d-flex align-items-start justify-content-between mb-3">
+                                <div class="metric-icon bg-info-subtle text-info">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </div>
+                                <span class="growth-badge bg-info-subtle text-info">Avg</span>
+                            </div>
+                            <div class="metric-label text-muted mb-1">Avg Order Value</div>
+                            <div class="metric-value text-dark">₹<%= parseFloat(avgOrderValue).toLocaleString('en-IN') %></div>
+                            <div class="text-muted small mt-1"><%= cancelledCount %> cancelled orders</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ── Charts Row ─────────────────────────────────────────── -->
+                <div class="row g-4 mb-4">
+
+                    <!-- Bar Chart: Last 6 months -->
+                    <div class="col-lg-7">
+                        <div class="chart-card bg-white p-4 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <p class="section-heading mb-1">Revenue Trend</p>
+                                    <h6 class="fw-bold text-dark mb-0">Last 6 Months</h6>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-success fs-5">₹<%= parseFloat(totalEarnings).toLocaleString('en-IN') %></div>
+                                    <div class="text-muted" style="font-size:0.75rem;">All-time revenue</div>
+                                </div>
+                            </div>
+                            <div style="position:relative; height:260px;">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Health Summary -->
+                    <div class="col-lg-5">
+                        <div class="chart-card bg-white p-4 h-100">
+                            <p class="section-heading mb-1">Order Health</p>
+                            <h6 class="fw-bold text-dark mb-4">Fulfilment Overview</h6>
+
+                            <% const totalAllOrders = deliveredCount + cancelledCount + pendingCount; %>
+
+                            <!-- Delivered -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="d-inline-block rounded-circle bg-success" style="width:8px;height:8px;"></span>
+                                        <span class="small fw-medium">Delivered</span>
+                                    </div>
+                                    <span class="fw-bold small text-success"><%= deliveredCount %> orders</span>
+                                </div>
+                                <div class="revenue-bar">
+                                    <div class="revenue-bar-fill bg-success" style="width:<%= totalAllOrders > 0 ? Math.round((deliveredCount/totalAllOrders)*100) : 0 %>%;"></div>
+                                </div>
+                                <div class="text-muted mt-1" style="font-size:0.72rem;"><%= totalAllOrders > 0 ? Math.round((deliveredCount/totalAllOrders)*100) : 0 %>% fulfilment rate</div>
+                            </div>
+
+                            <!-- In Progress -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="d-inline-block rounded-circle bg-primary" style="width:8px;height:8px;"></span>
+                                        <span class="small fw-medium">In Progress</span>
+                                    </div>
+                                    <span class="fw-bold small text-primary"><%= pendingCount %> orders</span>
+                                </div>
+                                <div class="revenue-bar">
+                                    <div class="revenue-bar-fill bg-primary" style="width:<%= totalAllOrders > 0 ? Math.round((pendingCount/totalAllOrders)*100) : 0 %>%;"></div>
+                                </div>
+                                <div class="text-muted mt-1" style="font-size:0.72rem;"><%= totalAllOrders > 0 ? Math.round((pendingCount/totalAllOrders)*100) : 0 %>% of total</div>
+                            </div>
+
+                            <!-- Cancelled -->
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="d-inline-block rounded-circle bg-danger" style="width:8px;height:8px;"></span>
+                                        <span class="small fw-medium">Cancelled</span>
+                                    </div>
+                                    <span class="fw-bold small text-danger"><%= cancelledCount %> orders</span>
+                                </div>
+                                <div class="revenue-bar">
+                                    <div class="revenue-bar-fill bg-danger" style="width:<%= totalAllOrders > 0 ? Math.round((cancelledCount/totalAllOrders)*100) : 0 %>%;"></div>
+                                </div>
+                                <div class="text-muted mt-1" style="font-size:0.72rem;"><%= totalAllOrders > 0 ? Math.round((cancelledCount/totalAllOrders)*100) : 0 %>% cancellation rate</div>
+                            </div>
+
+                            <!-- Month Growth Box -->
+                            <div class="rounded-3 p-3 mt-auto <%= monthGrowth >= 0 ? 'bg-success-subtle' : 'bg-danger-subtle' %>">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi <%= monthGrowth >= 0 ? 'bi-trending-up text-success' : 'bi-trending-down text-danger' %> fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold small <%= monthGrowth >= 0 ? 'text-success' : 'text-danger' %>">
+                                            <%= monthGrowth >= 0 ? '+' : '' %><%= monthGrowth %>% vs last month
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.72rem;">Month-over-month revenue change</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ── Bottom Row: Top Products + Transactions ──────────── -->
+                <div class="row g-4">
+
+                    <!-- Top 5 Products -->
+                    <div class="col-lg-5">
+                        <div class="chart-card bg-white p-4 h-100">
+                            <p class="section-heading mb-1">Top Performers</p>
+                            <h6 class="fw-bold text-dark mb-4">Best Selling Products</h6>
+
+                            <% if (!topProducts || topProducts.length === 0) { %>
+                                <div class="text-center py-4">
+                                    <i class="bi bi-box-seam display-4 text-muted opacity-25 d-block mb-2"></i>
+                                    <p class="text-muted small mb-0">No delivered orders yet</p>
+                                </div>
+                            <% } else { %>
+                                <% const maxRevenue = topProducts[0] ? topProducts[0].totalRevenue : 1; %>
+                                <% topProducts.forEach((p, idx) => { %>
+                                    <div class="d-flex align-items-center gap-3 mb-3 <%= idx < topProducts.length - 1 ? 'pb-3 border-bottom' : '' %>">
+                                        <span class="rank-badge rank-<%= idx < 3 ? idx+1 : 'other' %>"><%= idx + 1 %></span>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="fw-semibold small text-dark text-truncate"><%= p.productName %></div>
+                                            <div class="revenue-bar mt-1">
+                                                <div class="revenue-bar-fill" style="width:<%= Math.round((p.totalRevenue / maxRevenue) * 100) %>%;"></div>
+                                            </div>
+                                            <div class="text-muted mt-1" style="font-size:0.72rem;"><%= p.totalQty %> units · <%= p.orderCount %> orders</div>
+                                        </div>
+                                        <div class="text-end flex-shrink-0">
+                                            <div class="fw-bold small text-success">₹<%= p.totalRevenue.toLocaleString('en-IN') %></div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="col-lg-7">
+                        <div class="chart-card bg-white h-100">
+                            <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+                                <div>
+                                    <p class="section-heading mb-1">Transactions</p>
+                                    <h6 class="fw-bold text-dark mb-0">Recent Deliveries</h6>
+                                </div>
+                                <span class="text-muted small"><%= totalTxns %> total</span>
+                            </div>
+
+                            <% if (!transactions || transactions.length === 0) { %>
+                                <div class="text-center py-5">
+                                    <i class="bi bi-receipt display-4 text-muted opacity-25 d-block mb-2"></i>
+                                    <p class="text-muted small mb-0">No completed transactions yet</p>
+                                </div>
+                            <% } else { %>
+                                <table class="table earnings-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Order</th>
+                                            <th>Date</th>
+                                            <th class="text-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% transactions.forEach(txn => { %>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <img src="<%= txn.user && txn.user.profileImage ? txn.user.profileImage : 'https://ui-avatars.com/?name=' + encodeURIComponent(txn.user ? txn.user.name : 'U') + '&background=0d6efd&color=fff&size=36' %>"
+                                                             alt="" class="txn-avatar">
+                                                        <div>
+                                                            <div class="fw-semibold text-dark" style="font-size:0.85rem;"><%= txn.user ? txn.user.name : 'Unknown' %></div>
+                                                            <div class="text-muted" style="font-size:0.72rem;"><%= txn.items.length %> item<%= txn.items.length !== 1 ? 's' : '' %></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a href="/shop/orders/<%= txn._id %>" class="fw-medium text-decoration-none text-primary" style="font-size:0.82rem;">
+                                                        #<%= txn.orderNumber %>
+                                                    </a>
+                                                </td>
+                                                <td class="text-muted" style="font-size:0.8rem;">
+                                                    <%= new Date(txn.createdAt).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="fw-bold text-success" style="font-size:0.88rem;">+₹<%= txn.totalAmount.toLocaleString('en-IN') %></span>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+
+                                <!-- Pagination -->
+                                <% if (totalPages > 1) { %>
+                                    <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                                        <span class="text-muted small">Page <%= currentPage %> of <%= totalPages %></span>
+                                        <div class="d-flex gap-2">
+                                            <a href="?page=<%= currentPage - 1 %>"
+                                               class="btn btn-sm btn-outline-secondary rounded-pill px-3 <%= currentPage === 1 ? 'disabled' : '' %>">
+                                                ‹ Prev
+                                            </a>
+                                            <a href="?page=<%= currentPage + 1 %>"
+                                               class="btn btn-sm btn-outline-primary rounded-pill px-3 <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                                Next ›
+                                            </a>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% } %>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ── Bar Chart Script ───────────────────────────────────────── -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const barLabels = <%- JSON.stringify(barLabels) %>;
+            const barData   = <%- JSON.stringify(barData) %>;
+            const hasData   = barData.some(v => v > 0);
+
+            const ctx = document.getElementById('barChart').getContext('2d');
+
+            // Gradient fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+            gradient.addColorStop(0, 'rgba(13, 110, 253, 0.85)');
+            gradient.addColorStop(1, 'rgba(111, 66, 193, 0.85)');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: barLabels,
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: barData,
+                        backgroundColor: gradient,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        barPercentage: 0.6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ' ₹' + ctx.parsed.y.toLocaleString('en-IN')
+                            },
+                            padding: 10,
+                            cornerRadius: 8,
+                        },
+                        // Empty state message
+                        ...(hasData ? {} : {
+                            afterDraw: chart => {
+                                const { ctx: c, width, height } = chart;
+                                c.save();
+                                c.textAlign = 'center';
+                                c.textBaseline = 'middle';
+                                c.fillStyle = '#adb5bd';
+                                c.font = '14px Inter, sans-serif';
+                                c.fillText('No revenue in the last 6 months', width / 2, height / 2);
+                                c.restore();
+                            }
+                        })
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f3f5', borderDash: [4, 4] },
+                            border: { dash: [4, 4] },
+                            ticks: {
+                                callback: v => '₹' + (v >= 1000 ? (v/1000).toFixed(0)+'k' : v),
+                                font: { size: 11 }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 12, weight: '600' } }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+<%- include('./partials/footer') %>

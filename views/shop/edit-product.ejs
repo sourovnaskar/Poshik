@@ -1,0 +1,223 @@
+<%- include('./partials/header') %>
+
+    <style>
+        .preview-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .preview-image-wrapper {
+            position: relative; width: 90px; height: 90px;
+            border-radius: 8px; overflow: hidden;
+            border: 2px solid #dee2e6;
+        }
+        .preview-image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-image-wrapper .remove-overlay {
+            position: absolute; inset: 0;
+            background: rgba(220,53,69,0.8);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .preview-image-wrapper:hover .remove-overlay { opacity: 1; }
+        .img-remove-check { display: none; }
+        .img-remove-check:checked ~ .remove-overlay { opacity: 1; background: rgba(220,53,69,0.9); }
+    </style>
+
+    <%- include('./partials/navbar') %>
+
+    <div class="container-fluid">
+        <div class="row">
+            <%- include('./partials/sidebar') %>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 bg-light min-vh-100">
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h1 class="h3 fw-bold text-dark mb-1">Edit Product</h1>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 small">
+                                <li class="breadcrumb-item"><a href="/shop/dashboard" class="text-decoration-none">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="/shop/all/products" class="text-decoration-none">Products</a></li>
+                                <li class="breadcrumb-item active">Edit</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <a href="/shop/all/products" class="btn btn-outline-secondary rounded-pill px-3">
+                        <i class="bi bi-arrow-left me-1"></i> Back
+                    </a>
+                </div>
+
+                <%- include('./partials/flash') %>
+
+                <form action="/shop/products/update/<%= product._id %>" method="POST" enctype="multipart/form-data">
+                    <div class="row g-4">
+
+                        <!-- Left: Core Details -->
+                        <div class="col-lg-8">
+
+                            <!-- Basic Info Card -->
+                            <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+                                <h6 class="fw-bold text-uppercase text-muted small mb-3 pb-2 border-bottom">
+                                    <i class="bi bi-info-circle me-1 text-primary"></i>Product Details
+                                </h6>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Product Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="name" class="form-control" value="<%= product.name %>" required maxlength="200">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Description</label>
+                                    <textarea name="description" class="form-control" rows="4" maxlength="2000" placeholder="Describe your product..."><%= product.description || '' %></textarea>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label fw-semibold small">Category <span class="text-danger">*</span></label>
+                                    <select name="category" class="form-select" required>
+                                        <% categories.forEach(cat => { %>
+                                            <option value="<%= cat._id %>" <%= product.category && product.category._id.toString() === cat._id.toString() ? 'selected' : '' %>>
+                                                <%= cat.name %>
+                                            </option>
+                                        <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Card -->
+                            <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+                                <h6 class="fw-bold text-uppercase text-muted small mb-3 pb-2 border-bottom">
+                                    <i class="bi bi-tag me-1 text-primary"></i>Pricing & Stock
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">MRP (₹) <span class="text-danger">*</span></label>
+                                        <input type="number" name="mrp" class="form-control" value="<%= product.mrp %>" min="0" step="0.01" required>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">Selling Price (₹) <span class="text-danger">*</span></label>
+                                        <input type="number" name="price" class="form-control" value="<%= product.price %>" min="0" step="0.01" required>
+                                        <div class="form-text">Must be ≤ MRP</div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label class="form-label fw-semibold small">Stock <span class="text-danger">*</span></label>
+                                        <input type="number" name="stock" class="form-control" value="<%= product.stock %>" min="0" required>
+                                    </div>
+                                </div>
+                                <% if (product.discountPercentage > 0) { %>
+                                    <div class="alert alert-success-subtle border-0 rounded-2 mt-3 py-2 px-3 d-flex align-items-center gap-2 bg-success-subtle" style="font-size:0.85rem;">
+                                        <i class="bi bi-tag-fill text-success"></i>
+                                        <span>Current discount: <strong><%= product.discountPercentage %>% OFF</strong> — will auto-recalculate on save.</span>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <!-- Images Card -->
+                            <div class="bg-white rounded-3 shadow-sm p-4">
+                                <h6 class="fw-bold text-uppercase text-muted small mb-3 pb-2 border-bottom">
+                                    <i class="bi bi-images me-1 text-primary"></i>Product Images
+                                </h6>
+
+                                <!-- Existing images with remove checkboxes -->
+                                <p class="small text-muted mb-2">Current images — tick to remove:</p>
+                                <div class="preview-container" id="existingImages">
+                                    <% product.images.forEach((imgUrl, idx) => { %>
+                                        <label class="preview-image-wrapper" style="cursor:pointer;" title="Click to mark for removal">
+                                            <input type="checkbox" name="removeImages" value="<%= imgUrl %>" class="img-remove-check">
+                                            <img src="<%= imgUrl %>" alt="Product image <%= idx+1 %>">
+                                            <div class="remove-overlay">
+                                                <i class="bi bi-x-circle-fill text-white fs-4"></i>
+                                            </div>
+                                        </label>
+                                    <% }) %>
+                                </div>
+
+                                <!-- Upload new images -->
+                                <div class="mt-3">
+                                    <label class="form-label fw-semibold small">Add New Images (up to 4 total)</label>
+                                    <input type="file" name="images" class="form-control" accept="image/*" multiple id="newImageInput">
+                                    <div class="preview-container" id="newImagePreview"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Status & Save -->
+                        <div class="col-lg-4">
+                            <div class="bg-white rounded-3 shadow-sm p-4 mb-4 position-sticky" style="top:20px;">
+                                <h6 class="fw-bold text-uppercase text-muted small mb-3 pb-2 border-bottom">
+                                    <i class="bi bi-toggle-on me-1 text-primary"></i>Visibility
+                                </h6>
+                                <div class="form-check form-switch mb-4">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                           id="isActiveSwitch" name="isActive"
+                                           <%= product.isActive ? 'checked' : '' %>>
+                                    <label class="form-check-label fw-semibold" for="isActiveSwitch">
+                                        <%= product.isActive ? 'Active (Visible to customers)' : 'Draft (Hidden)' %>
+                                    </label>
+                                </div>
+
+                                <!-- Product summary -->
+                                <div class="border rounded-2 p-3 mb-4 bg-light">
+                                    <div class="d-flex justify-content-between small mb-1">
+                                        <span class="text-muted">Stock</span>
+                                        <span class="fw-semibold <%= product.stock > 10 ? 'text-success' : product.stock > 0 ? 'text-warning' : 'text-danger' %>">
+                                            <%= product.stock > 0 ? product.stock + ' units' : 'Out of Stock' %>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between small mb-1">
+                                        <span class="text-muted">Selling Price</span>
+                                        <span class="fw-bold text-success">₹<%= product.price %></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between small">
+                                        <span class="text-muted">Discount</span>
+                                        <span class="fw-semibold"><%= product.discountPercentage > 0 ? product.discountPercentage + '%' : 'None' %></span>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 fw-bold rounded-pill mb-2 shadow-sm">
+                                    <i class="bi bi-check-circle-fill me-2"></i>Save Changes
+                                </button>
+                                <a href="/shop/all/products" class="btn btn-outline-secondary w-100 rounded-pill">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+                <!-- Delete Zone -->
+                <div class="bg-white rounded-3 shadow-sm p-4 mt-4 border border-danger-subtle">
+                    <h6 class="fw-bold text-danger mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>Danger Zone</h6>
+                    <p class="text-muted small mb-3">Deleting a product is permanent. All images will also be removed from storage.</p>
+                    <form action="/shop/products/delete/<%= product._id %>" method="POST"
+                          onsubmit="return confirm('Are you sure you want to permanently delete ? This cannot be undone.')">
+                        <button type="submit" class="btn btn-outline-danger fw-bold rounded-pill px-4">
+                            <i class="bi bi-trash3 me-1"></i>Delete This Product
+                        </button>
+                    </form>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle label text on switch change
+        const sw = document.getElementById('isActiveSwitch');
+        const swLabel = sw.nextElementSibling;
+        sw.addEventListener('change', () => {
+            swLabel.textContent = sw.checked ? 'Active (Visible to customers)' : 'Draft (Hidden)';
+        });
+
+        // Preview newly selected images
+        document.getElementById('newImageInput').addEventListener('change', function () {
+            const preview = document.getElementById('newImagePreview');
+            preview.innerHTML = '';
+            [...this.files].forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'preview-image-wrapper';
+                    wrap.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                    preview.appendChild(wrap);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+
+<%- include('./partials/footer') %>

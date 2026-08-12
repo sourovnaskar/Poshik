@@ -8,16 +8,17 @@ routes.get("/", (req, res) => {
 });
 
 const authRoutes = require("./authRoutes");
-routes.use("/api/auth", authRoutes);
+routes.use("/auth", authRoutes);
 
 const petRoutes = require("./petRoutes");
-routes.use("/api/pet", petRoutes);
+routes.use("/pet", petRoutes);
+routes.use("/user", petRoutes); 
 
 const doctorRoutes = require("./doctorRoutes");
-routes.use("/api/doctor", doctorRoutes);
+routes.use("/doctor", doctorRoutes);
 
 const shopRoutes = require("./shopRoutes");
-routes.use("/api/shop", shopRoutes);
+routes.use("/shop", shopRoutes);
 
 const adminRoutes = require("./adminRoutes");
 routes.use("/admin", adminRoutes);

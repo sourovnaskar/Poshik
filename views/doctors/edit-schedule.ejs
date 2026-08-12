@@ -16,7 +16,7 @@
                                 <p class="text-xs sm:text-sm text-gray-600 mt-1">Update the timings or token limit for
                                     this shift.</p>
                             </div>
-                            <a href="/api/doctor/appointment/schedule"
+                            <a href="/doctor/appointment/schedule"
                                 class="text-sm font-medium text-gray-500 hover:text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-md shadow-sm transition">
                                 ← Back to Schedule
                             </a>
@@ -30,7 +30,7 @@
                             <% const formattedDate=new Date(schedule.date).toISOString().split('T')[0]; %>
 
                                 <!-- Notice the action points to an update route with the schedule's ID -->
-                                <form action="/api/doctor/appointment/update/schedule/<%= schedule._id %>" method="POST"
+                                <form action="/doctor/appointment/update/schedule/<%= schedule._id %>" method="POST"
                                     class="space-y-6">
 
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -84,7 +84,7 @@
 
                                     <div
                                         class="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3">
-                                        <a href="/api/doctor/appointment/schedule"
+                                        <a href="/doctor/appointment/schedule"
                                             class="w-full sm:w-auto bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 px-6 rounded-md shadow-sm transition text-sm text-center">
                                             Cancel
                                         </a>

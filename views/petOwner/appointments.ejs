@@ -16,7 +16,7 @@
         <p class="text-muted small mb-0">Manage your upcoming and past veterinary visits.</p>
       </div>
       <div>
-        <a href="/api/pet/view/book-doctor" class="btn btn-primary fw-bold shadow-sm px-4 py-2 w-100 text-nowrap">
+        <a href="/pet/view/book-doctor" class="btn btn-primary fw-bold shadow-sm px-4 py-2 w-100 text-nowrap">
           <i class="fa-solid fa-plus me-2"></i> Book New Doctor
         </a>
       </div>
@@ -113,7 +113,7 @@
                 </div>
                 
                 <% if (appointment.status === 'Confirmed' || appointment.status === 'Pending') { %>
-                  <form action="/api/user/appointment/cancel/<%= appointment._id %>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');" class="m-0">
+                  <form action="/user/appointment/cancel/<%= appointment._id %>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');" class="m-0">
                     <button type="submit" class="btn btn-outline-danger btn-sm fw-bold px-3 py-2 rounded-3 transition-all hover-shadow">
                       Cancel Visit
                     </button>
@@ -140,7 +140,7 @@
           You haven't booked any veterinary visits yet. Keep your pets healthy by scheduling a routine checkup today.
         </p>
         <div>
-          <a href="/api/pet/view/book-doctor" class="btn btn-primary fw-bold px-5 py-2 rounded-3 shadow-sm">
+          <a href="/pet/view/book-doctor" class="btn btn-primary fw-bold px-5 py-2 rounded-3 shadow-sm">
             Find a Doctor
           </a>
         </div>

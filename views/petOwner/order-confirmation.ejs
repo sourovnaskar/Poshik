@@ -1,0 +1,163 @@
+<%- include('./partials/header') %>
+    <%- include('./partials/navbar') %>
+
+    <style>
+        @keyframes popIn {
+            0%   { transform: scale(0.5) rotate(-20deg); opacity: 0; }
+            80%  { transform: scale(1.08) rotate(3deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+        .success-icon {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            display: inline-block;
+        }
+        .confirm-card {
+            border: none;
+            border-radius: 1.25rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.35em 0.75em;
+            border-radius: 50rem;
+            font-weight: 600;
+        }
+        .item-img {
+            width: 52px; height: 52px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .info-row:last-child { border-bottom: none; }
+    </style>
+
+    <div class="d-flex bg-light min-vh-100">
+        <main class="flex-grow-1 px-md-4 py-5 mb-5" style="width:0; overflow-x:hidden;">
+
+            <%- include('./partials/flash') %>
+
+            <!-- ✅ Success Banner -->
+            <div class="text-center mb-5">
+                <span class="success-icon fs-1">✅</span>
+                <h1 class="h2 fw-bold text-dark mt-3">Order Placed Successfully!</h1>
+                <p class="text-muted">Thank you for your order. We've notified the shop and they'll confirm it soon.</p>
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <a href="/user/orders" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="bi bi-box-seam me-2"></i>My Orders
+                    </a>
+                    <a href="/pet/view/shop" class="btn btn-outline-secondary rounded-pill px-4">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+
+                <!-- Order Info -->
+                <div class="col-lg-7">
+                    <div class="bg-white confirm-card p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                            <div>
+                                <p class="text-muted small mb-1">Order Number</p>
+                                <h5 class="fw-bold text-dark mb-0">#<%= order.orderNumber %></h5>
+                            </div>
+                            <span class="badge
+                                <% if (order.orderStatus === 'Pending')    { %>bg-warning-subtle text-warning border border-warning-subtle
+                                <% } else if (order.orderStatus === 'Confirmed') { %>bg-info-subtle text-info border border-info-subtle
+                                <% } else if (order.orderStatus === 'Processing') { %>bg-primary-subtle text-primary border border-primary-subtle
+                                <% } else if (order.orderStatus === 'Shipped') { %>bg-purple-subtle text-purple border border-secondary-subtle
+                                <% } else if (order.orderStatus === 'Delivered') { %>bg-success-subtle text-success border border-success-subtle
+                                <% } else { %>bg-danger-subtle text-danger border border-danger-subtle
+                                <% } %>
+                                status-badge">
+                                <%= order.orderStatus %>
+                            </span>
+                        </div>
+
+                        <!-- Items List -->
+                        <p class="fw-bold small text-uppercase text-muted mb-3">Items Ordered</p>
+                        <div class="d-flex flex-column gap-3 mb-3">
+                            <% order.items.forEach(item => { %>
+                                <div class="d-flex align-items-center gap-3">
+                                    <% if (item.product && item.product.images && item.product.images.length > 0) { %>
+                                        <img src="<%= item.product.images[0] %>" alt="<%= item.productName %>" class="item-img border">
+                                    <% } else { %>
+                                        <div class="item-img bg-light border d-flex align-items-center justify-content-center text-muted">
+                                            <i class="bi bi-box fs-5"></i>
+                                        </div>
+                                    <% } %>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold small"><%= item.productName %></div>
+                                        <div class="text-muted small">Qty: <%= item.quantity %> × ₹<%= item.price %></div>
+                                    </div>
+                                    <div class="fw-bold small text-success">₹<%= item.subtotal %></div>
+                                </div>
+                            <% }) %>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="d-flex justify-content-between fw-bold fs-5 border-top pt-3">
+                            <span>Total Paid</span>
+                            <span class="text-success">₹<%= order.totalAmount %></span>
+                        </div>
+                    </div>
+
+                    <!-- Shipping & Payment Info -->
+                    <div class="bg-white confirm-card p-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <p class="fw-bold small text-uppercase text-muted mb-3">
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>Delivery Address
+                                </p>
+                                <p class="fw-semibold mb-1"><%= order.shippingAddress.name %></p>
+                                <p class="text-muted small mb-1"><%= order.shippingAddress.phone %></p>
+                                <p class="text-muted small mb-0">
+                                    <%= order.shippingAddress.address %>,<br>
+                                    <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> — <%= order.shippingAddress.postalCode %>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="fw-bold small text-uppercase text-muted mb-3">
+                                    <i class="bi bi-credit-card-fill text-primary me-1"></i>Payment
+                                </p>
+                                <div class="info-row">
+                                    <span class="text-muted small">Method</span>
+                                    <span class="fw-semibold small">
+                                        <% if (order.paymentMethod === 'COD') { %>
+                                            💵 Cash on Delivery
+                                        <% } else { %>
+                                            💳 Online
+                                        <% } %>
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="text-muted small">Status</span>
+                                    <span class="badge
+                                        <% if (order.paymentStatus === 'Paid') { %>bg-success-subtle text-success<% } else if (order.paymentStatus === 'Failed') { %>bg-danger-subtle text-danger<% } else { %>bg-warning-subtle text-warning<% } %>">
+                                        <%= order.paymentStatus %>
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="text-muted small">Shop</span>
+                                    <span class="fw-semibold small"><%= order.shop.shopName %></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="text-muted small">Date</span>
+                                    <span class="small"><%= new Date(order.createdAt).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}) %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+<%- include('./partials/footer') %>

@@ -56,7 +56,7 @@
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <form action="/api/doctor/appointments/update/<%= appt._id %>" method="POST" class="inline-flex flex-col sm:flex-row items-center gap-2">
+                    <form action="/doctor/appointments/update/<%= appt._id %>" method="POST" class="inline-flex flex-col sm:flex-row items-center gap-2">
                       <select name="status" class="text-sm border-gray-300 rounded-md shadow-sm focus:border-teal-500 focus:ring focus:ring-teal-200 focus:ring-opacity-50 py-1.5 pl-3 pr-8">
                         <option value="Confirmed" <%= appt.status === 'Confirmed' ? 'selected' : '' %>>Confirm</option>
                         <option value="Completed" <%= appt.status === 'Completed' ? 'selected' : '' %>>Complete</option>
