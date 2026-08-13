@@ -153,9 +153,9 @@ Poshik/
 │   │   └── verificationModel.js   # Email verification token schema
 │   ├── routes/
 │   │   ├── authRoutes.js          # /auth/* routes
-│   │   ├── petRoutes.js           # /api/pet/* routes
-│   │   ├── shopRoutes.js          # /api/shop/* routes
-│   │   ├── doctorRoutes.js        # /api/doctor/* routes
+│   │   ├── petRoutes.js           # /pet/* routes
+│   │   ├── shopRoutes.js          # /shop/* routes
+│   │   ├── doctorRoutes.js        # /doctor/* routes
 │   │   └── adminRoutes.js         # /admin/* routes
 │   └── utils/
 │       ├── email/
@@ -178,7 +178,7 @@ Poshik/
 │   │   ├── order-detail.ejs       # Order detail with status update
 │   │   └── earnings.ejs           # Earnings analytics page
 │   └── petOwner/
-│       ├── partials/              # navbar, footer, flash
+│       ├── partials/              # navbar, sidebar, header, footer, flash
 │       ├── dashboard.ejs          # Pet owner dashboard (fully dynamic)
 │       ├── pet-shop.ejs           # Shop directory with search
 │       ├── products.ejs           # Shop storefront with search + filters
@@ -206,7 +206,7 @@ Poshik/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/poshik.git
+git clone https://github.com/sourovnaskar/poshik.git
 cd poshik
 
 # 2. Install dependencies
@@ -263,9 +263,9 @@ SESSION_SECRET=your_session_secret
 ### Registration Roles
 | Role | KYC Required | Redirects To |
 |------|-------------|-------------|
-| `Owner` | ❌ No | `/api/pet/dashboard` |
-| `Doctor` | ✅ Yes | `/api/doctor/dashboard` |
-| `Shop` | ✅ Yes | `/api/shop/dashboard` |
+| `Owner` | ❌ No | `/pet/dashboard` |
+| `Doctor` | ✅ Yes | `/doctor/dashboard` |
+| `Shop` | ✅ Yes | `/shop/dashboard` |
 
 ### KYC Workflow (Doctor & Shop Owner)
 ```
@@ -368,6 +368,7 @@ The **Order Delivered** email automatically populates: customer name, shop name,
 
 - 🌐 GitHub: [github.com/sourovnaskar](https://github.com/sourovnaskar)
 - 💼 LinkedIn: [linkedin.com/in/sourovnaskar](https://linkedin.com/in/sourovnaskar)
+- 🔗 Portfolio:[portfolio-usmy.onrender.com](https://portfolio-usmy.onrender.com/)
 
 ---
 
