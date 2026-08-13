@@ -7,7 +7,8 @@ const cloudinary = require("../config/cloudinary");
 const fs = require("fs/promises");
 const crypto = require("crypto");
 
-const sendVerificationEmail = require("../utils/email/sendEmail");
+const sendVerificationEmail = require("../utils/email/sendEmail").sendVerificationEmail;
+const sendPasswordResetEmail = require("../utils/email/sendEmail").sendPasswordResetEmail;
 
 class AuthController {
   registerView(req, res) {
@@ -225,6 +226,98 @@ class AuthController {
     } catch (error) {
       console.error(error.message);
       req.flash("error", "Something went wrong. Please try again.");
+    }
+  }
+  
+  forgotPasswordView(req, res) {
+    res.render("forgot-password", { Title: "Forgot Password" });
+  }
+
+  async forgotPassword(req, res) {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+
+
+      if (!user) {
+        req.flash("success", "If that email exists, a reset link has been sent.");
+        return res.redirect("/auth/forgot-password");
+      }
+
+      const token = crypto.randomBytes(32).toString("hex");
+      user.resetPasswordToken = token;
+      user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
+      await user.save();
+
+      await sendPasswordResetEmail(user, token);
+
+      req.flash("success", "Password reset link sent to your email. Check your inbox.");
+      return res.redirect("/auth/forgot-password");
+    } catch (error) {
+      console.error("Forgot Password Error:", error.message);
+      req.flash("error", "Something went wrong. Please try again.");
+      return res.redirect("/auth/forgot-password");
+    }
+  }
+
+  async renderResetPassword(req, res) {
+    try {
+      const { token } = req.params;
+      const user = await User.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: new Date() },
+      });
+
+      if (!user) {
+        req.flash("error", "Password reset link is invalid or has expired.");
+        return res.redirect("/auth/forgot-password");
+      }
+
+      res.render("reset-password", { Title: "Reset Password", token });
+    } catch (error) {
+      console.error("Reset Password View Error:", error.message);
+      req.flash("error", "Something went wrong.");
+      return res.redirect("/auth/forgot-password");
+    }
+  }
+
+  async resetPassword(req, res) {
+    try {
+      const { token } = req.params;
+      const { password, confirmPassword } = req.body;
+
+      if (password !== confirmPassword) {
+        req.flash("error", "Passwords do not match.");
+        return res.redirect(`/auth/reset-password/${token}`);
+      }
+
+      if (password.length < 6) {
+        req.flash("error", "Password must be at least 6 characters.");
+        return res.redirect(`/auth/reset-password/${token}`);
+      }
+
+      const user = await User.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: new Date() },
+      });
+
+      if (!user) {
+        req.flash("error", "Password reset link is invalid or has expired.");
+        return res.redirect("/auth/forgot-password");
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
+      await user.save();
+
+      req.flash("success", "Password reset successfully! You can now log in.");
+      return res.redirect("/auth/login");
+    } catch (error) {
+      console.error("Reset Password Error:", error.message);
+      req.flash("error", "Something went wrong. Please try again.");
+      return res.redirect("/auth/forgot-password");
     }
   }
 }

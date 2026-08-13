@@ -22,5 +22,11 @@ routes.post("/login-create", authController.login);
 routes.get("/verify-email/:token", authController.verifyEmail);
 routes.get("/doctor/dashboard", authController.renderDashboard);
 
+// Forgot / Reset Password
+routes.get("/forgot-password", authController.forgotPasswordView);
+routes.post("/forgot-password", authController.forgotPassword);
+routes.get("/reset-password/:token", authController.renderResetPassword);
+routes.post("/reset-password/:token", authController.resetPassword);
+
 routes.get("/logout", authCheck, authController.logout);
 module.exports = routes;

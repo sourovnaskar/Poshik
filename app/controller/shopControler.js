@@ -6,6 +6,7 @@ const Order = require("../models/orderModel");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs/promises");
 const User = require("../models/userModel");
+const { sendOrderDeliveredEmail } = require("../utils/email/sendEmail");
 class ShopController {
   async renderDashboard(req, res) {
     const loggedUser = req.user;
@@ -880,6 +881,18 @@ class ShopController {
 
       existingOrder.orderStatus = newStatus;
       await existingOrder.save();
+
+      // ── Send delivery confirmation email ──────────────────────────────────
+      if (newStatus === "Delivered") {
+        try {
+          const orderUser = await User.findById(existingOrder.user);
+          if (orderUser) {
+            await sendOrderDeliveredEmail(orderUser, existingOrder, shop.shopName);
+          }
+        } catch (mailErr) {
+          console.error("Delivery email failed (non-blocking):", mailErr.message);
+        }
+      }
 
       req.flash("success", `Order status updated to "${newStatus}"`);
       return res.redirect(`/shop/orders/${orderId}`);

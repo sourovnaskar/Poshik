@@ -22,8 +22,6 @@ const loginSchema = Joi.object({
 });
 
 const PetSchema = Joi.object({
-  
-
   name: Joi.string().trim().max(100).required().messages({
     "string.empty": "Pet name is required",
     "string.max": "Pet name cannot exceed 100 characters",
@@ -69,17 +67,13 @@ const PetSchema = Joi.object({
   medicalHistory: Joi.string().optional(),
 });
 
-const shopDetailsSchema=Joi.object({
-shopName: Joi.string()
-    .trim()
-    .max(150)
-    .required()
-    .messages({
-      "string.base": "Shop name must be a string text.",
-      "string.empty": "Shop name is required.",
-      "string.max": "Shop name cannot exceed 150 characters.",
-      "any.required": "Shop name is a mandatory field.",
-    }),
+const shopDetailsSchema = Joi.object({
+  shopName: Joi.string().trim().max(150).required().messages({
+    "string.base": "Shop name must be a string text.",
+    "string.empty": "Shop name is required.",
+    "string.max": "Shop name cannot exceed 150 characters.",
+    "any.required": "Shop name is a mandatory field.",
+  }),
 
   description: Joi.string()
     .trim()
@@ -104,12 +98,9 @@ shopName: Joi.string()
       "any.required": "Business phone number is a mandatory field.",
     }),
 
-  address: Joi.string()
-    .trim()
-    .required()
-    .messages({
-      "string.empty": "Complete business address is required.",
-      "any.required": "Address is a mandatory field.",
-    }),
-})
-module.exports = { registerSchema, loginSchema, PetSchema,shopDetailsSchema };
+  address: Joi.string().trim().required().messages({
+    "string.empty": "Complete business address is required.",
+    "any.required": "Address is a mandatory field.",
+  }),
+});
+module.exports = { registerSchema, loginSchema, PetSchema, shopDetailsSchema };
