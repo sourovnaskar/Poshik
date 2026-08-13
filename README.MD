@@ -1,4 +1,4 @@
-# 🐾 Poshik — India's All-in-One Pet Care Platform
+# 🐾 Poshik — All-in-One Pet Care Platform
 
 <p align="center">
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
